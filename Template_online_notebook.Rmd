@@ -109,6 +109,127 @@ Today, I reviewed the UNIX commands we learned on 2018-01-24. I reviewed the tut
 ------
 <div id='id-section3'/>
 ### Page 3:
+
+Terminal 1:
+
+Last login: Sun Jan 28 21:49:28 on ttys000
+ip0af52b37:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Sun Jan 28 22:01:55 2018 from ip040133.uvm.edu
+[lerogers@pbio381 ~]$ cd /data/project_data/beetles/rawdata/
+[lerogers@pbio381 rawdata]$ ll
+total 18303292
+-rwx------. 1 mpespeni users 1150329980 Jan 28 13:47 WA_PP1_F1_AGTCAA_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1158015986 Jan 28 13:48 WA_PP1_F1_AGTCAA_L003_R2_001.fastq.gz
+-rwx------. 1 mpespeni users 1637031781 Jan 28 13:54 WA_PP1_F2_AGTTCC_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1651958363 Jan 28 13:55 WA_PP1_F2_AGTTCC_L003_R2_001.fastq.gz
+-rwx------. 1 mpespeni users 1628463663 Jan 28 14:08 WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1638518365 Jan 28 14:09 WA_PP1_F3_ATGTCA_L003_R2_001.fastq.gz
+-rwx------. 1 mpespeni users 1641575784 Jan 28 13:45 WA_PP1_M1_CCGTCC_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1657782742 Jan 28 13:45 WA_PP1_M1_CCGTCC_L003_R2_001.fastq.gz
+-rwx------. 1 mpespeni users 1641276981 Jan 28 14:11 WA_PP1_M2_GTCCGC_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1653780352 Jan 28 14:12 WA_PP1_M2_GTCCGC_L003_R2_001.fastq.gz
+-rwx------. 1 mpespeni users 1637276697 Jan 29 08:35 WA_PP1_M3_GTGAAA_L003_R1_001.fastq.gz
+-rwx------. 1 mpespeni users 1646538439 Jan 29 08:36 WA_PP1_M3_GTGAAA_L003_R2_001.fastq.gz
+[lerogers@pbio381 rawdata]$ cd WA_PP1_WA_PP1_F3*
+-bash: cd: WA_PP1_WA_PP1_F3*: No such file or directory
+[lerogers@pbio381 rawdata]$ cd WA_PP1_WA_PP1_F3
+-bash: cd: WA_PP1_WA_PP1_F3: No such file or directory
+[lerogers@pbio381 rawdata]$ zcat WA_PP1_WA_PP1_F3 | head -n4
+gzip: WA_PP1_WA_PP1_F3.gz: No such file or directory
+[lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R
+gzip: WA_PP1_F3_ATGTCA_L003_R.gz: No such file or directory
+[lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz  | head -n4
+@CCRI0219:155:C2LNBACXX:3:1101:1226:1976 1:N:0:ATGTCA
+TGGCGCCAAAAATAAGATGGAGAAAAAGAAATTAGTTGCGCATGCTGATGTTAAGTCTCGAGACCGGTACTATTTTAAATAAAAAAAATTTTATTTGATG
++
+B@CFFFFFDDFFHIFGGGHGFHGIIIGIGHIIIJJDHIGGIGDHHGDCGIIEGE@=DHGIGGGHFDD>>?CDDEEDDDDEEDDCDDDDDCDDDDDDEDDC
+[lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R1_001.^Cstq.gz 
+[lerogers@pbio381 rawdata]$ ^C
+[lerogers@pbio381 rawdata]$ ^C
+[lerogers@pbio381 rawdata]$ ^C
+[lerogers@pbio381 rawdata]$ ^V
+-bash: $'\026': command not found
+[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Started analysis of WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 5% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 10% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 15% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 20% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 25% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 30% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 35% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 40% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 45% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 50% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 55% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 60% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 65% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 70% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 75% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 80% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 85% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 90% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 95% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 100% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Analysis complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Failed to process file WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+java.io.FileNotFoundException: /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.zip (Permission denied)
+	at java.io.FileOutputStream.open0(Native Method)
+	at java.io.FileOutputStream.open(FileOutputStream.java:270)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+	at uk.ac.babraham.FastQC.Report.HTMLReportArchive.<init>(HTMLReportArchive.java:80)
+	at uk.ac.babraham.FastQC.Analysis.OfflineRunner.analysisComplete(OfflineRunner.java:155)
+	at uk.ac.babraham.FastQC.Analysis.AnalysisRunner.run(AnalysisRunner.java:110)
+	at java.lang.Thread.run(Thread.java:748)
+[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz -o u/fastqcoutput
+Specified output directory 'u/fastqcoutput' does not exist
+[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz  -o ~/fastqcoutput
+Specified output directory '/users/l/e/lerogers/fastqcoutput' does not exist
+[lerogers@pbio381 rawdata]$ cd ~
+[lerogers@pbio381 ~]$ mkdir fastqcoutput
+[lerogers@pbio381 ~]$ fastqc /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz -o ~/fastqcoutput
+Started analysis of WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 5% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 10% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 15% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 20% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 25% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 30% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 35% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 40% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 45% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 50% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 55% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 60% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 65% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 70% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 75% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 80% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 85% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 90% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 95% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Approx 100% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+Analysis complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+[lerogers@pbio381 ~]$ scp lerogers@pbio381.uvm.edu:~/fastqcoutput_fastqc.html .
+
+
+
+Terminal 2: 
+
+Last login: Mon Jan 29 10:31:25 on ttys000
+ip0af52b37:~ Lucy$ cd /Users/Lucy/Desktop/Ecological\ Genomics\ Terminal\ Output\ files 
+ip0af52b37:Ecological Genomics Terminal Output files Lucy$ pwd
+/Users/Lucy/Desktop/Ecological Genomics Terminal Output files
+ip0af52b37:Ecological Genomics Terminal Output files Lucy$ scp lerogers@pbio381.uvm.edu:~/fastqcoutput/* .
+lerogers@pbio381.uvm.edu's password: 
+WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.html      100%  331KB 331.1KB/s   00:00    
+WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.zip       100%  428KB 428.0KB/s   00:00    
+ip0af52b37:Ecological Genomics Terminal Output files Lucy$ 
+
+
+
 ------
 <div id='id-section4'/>
 ### Page 4:
