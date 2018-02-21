@@ -33,8 +33,8 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 * [Page 5:2018-02-05](#id-section5). Explore sam output, install DESeq into RStudio
 * [Page 6:2018-02-07](#id-section6). Review bash script, use DESeq in R to write code to test for differences in gene expression
 * [Page 7:2018-02-12](#id-section7). Writing R Script to test for differential gene expression
-* [Page 8:2018-02-14](#id-section8). Writing R Script
-* [Page 9:2018-02-21](#id-section9). Writing R Script, actual script is posted here
+* [Page 8:2018-02-14](#id-section8). Writing R Script, actual script is posted here
+* [Page 9:2018-02-21](#id-section9). Writing R Script
 * [Page 10:](#id-section10).
 * [Page 11:](#id-section11).
 * [Page 12:](#id-section12).
@@ -374,13 +374,7 @@ We worked on writing our R script for testing for differential gene expression
 ------
 <div id='id-section8'/>
 ### Page 8: 2018-02-14
-More R script work
-
-------
-<div id='id-section9'/>
-### Page 9:2018-02-21
-
-Finishing the R script. Here is the script, pasted below:
+More R script work. Here is the script, pasted below:
 
 # set working directory
 setwd("~/Desktop/Ecological Genomics Terminal Output files")
@@ -537,8 +531,234 @@ colnames(res_pop_negpval)=c("gene","neglogpval")
 write.csv(res_pop_negpval, file="DGE_NCvsWA_pop_neglogpval_classDay6.csv", row.names=F,quote=F)
 
 ------
+<div id='id-section9'/>
+### Page 9:2018-02-21
+
+Notes on my question about bash script: allows you to write multiple commands at once and then send them to the server all at once.  Allows you to document your command all at once, also allows you to go in screen mode and then leave your computer for a week and have it be running things while you disconnect from you.  When you use command line you are also using bash, but bash script is when you open up a new screen and write a script. UNIX can also understand python scripts.
+
+We found that the DESeq version is different and is segregating the class between version 1.18.1 and 1.14.1.  This is a lesson about the importance of reporting your version when you are writing a paper.
+
+Using R, we made a heat map comparing WAF, WAM, NCF, NCM.   Here is the new script we wrote: 
+
+# set working directory
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+library("DESeq2")
+library("ggplot2")
+
+countsTable <- read.delim('allcountsdataRN_noIT.txt',header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+countData <- as.matrix(countsTable)
+head(countData)
+
+conds <- read.delim("cols_data_noIT.txt", header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+head(conds)
+colData <- as.data.frame(conds)
+
+############################# Day 7 Transcriptomics
+
+
+colData$group <- factor(paste0(colData$population, "-", colData$devstage, "-", colData$sex))
+head(colData)
+
+dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ group)
+dds <- dds[rowSums(counts(dds)) > 1, ]
+dim(dds)
+
+dds <- DESeq(dds, modelMatrixType = "standard", parallel =T)
+#dds <- DESeq(dds, modelMatrixType = "expanded", parallel=T)
+
+resultsNames(dds)
+# [1] "Intercept"                  "group_NC.AD4.M_vs_NC.AD4.F" "group_NC.L3L.F_vs_NC.AD4.F" "group_NC.L3L.M_vs_NC.AD4.F"
+# [5] "group_NC.PD1.F_vs_NC.AD4.F" "group_NC.PD1.M_vs_NC.AD4.F" "group_NC.PP1.F_vs_NC.AD4.F" "group_NC.PP1.M_vs_NC.AD4.F"
+# [9] "group_WA.AD4.F_vs_NC.AD4.F" "group_WA.AD4.M_vs_NC.AD4.F" "group_WA.L3L.F_vs_NC.AD4.F" "group_WA.L3L.M_vs_NC.AD4.F"
+# [13] "group_WA.PD1.F_vs_NC.AD4.F" "group_WA.PD1.M_vs_NC.AD4.F" "group_WA.PP1.F_vs_NC.AD4.F" "group_WA.PP1.M_vs_NC.AD4.F"
+
+res_pop_PP1_F <- results(dds, contrast = list(c("group_NC.PP1.F_vs_NC.AD4.F"),c("group_WA.PP1.F_vs_NC.AD4.F")), listValues = c(1/2,-1/2), alpha = 0.05)
+
+res_pop_PP1_F <-res_pop_PP1_F[order(res_pop_PP1_F$padj),]
+head(res_pop_PP1_F)
+# log2 fold change (MLE): 0.5 group_NC.PP1.F_vs_NC.AD4.F vs 0.5 group_WA.PP1.F_vs_NC.AD4.F 
+# Wald test p-value: 0.5 group_NC.PP1.F_vs_NC.AD4.F vs 0.5 group_WA.PP1.F_vs_NC.AD4.F 
+# DataFrame with 6 rows and 6 columns
+# baseMean log2FoldChange     lfcSE       stat       pvalue         padj
+# <numeric>      <numeric> <numeric>  <numeric>    <numeric>    <numeric>
+#   OTAU012622-RA   31.61690     -24.015012  1.336019 -17.975053 3.055737e-72 4.245641e-68
+# OTAU009289-RA   19.87268      16.377873  1.973838   8.297477 1.063460e-16 7.387858e-13
+# OTAU007155-RA 2989.82336     -10.440891  1.286915  -8.113117 4.933741e-16 2.284980e-12
+# OTAU012427-RA   51.36362       9.162012  1.149377   7.971287 1.570307e-15 5.454462e-12
+# OTAU010169-RA   12.03314       9.613149  1.243946   7.727950 1.092923e-14 3.037015e-11
+# OTAU011364-RA 2094.24323       8.803863  1.208617   7.284246 3.234734e-13 7.490565e-10
+
+summary(res_pop_PP1_F)
+# out of 16851 with nonzero total read count
+# adjusted p-value < 0.05
+# LFC > 0 (up)     : 46, 0.27% 
+# LFC < 0 (down)   : 31, 0.18% 
+# outliers [1]     : 17, 0.1% 
+# low counts [2]   : 2940, 17% 
+# (mean count < 3)
+
+############# Pull out significant genes to be able to make a heatmap
+
+sig_pop_PP1_F <- res_pop_PP1_F[which(res_pop_PP1_F$padj <0.05), ]  # great way to subset data
+dim(sig_pop_PP1_F) # check
+
+sig_pop_PP1_F_df <- as.data.frame(sig_pop_PP1_F)
+sig_pop_PP1_F_df$Row.names <- rownames(sig_pop_PP1_F_df)
+dim(sig_pop_PP1_F_df) #column dimensions increase by one because we made the rownames a new column
+
+genesOfInterest_pop_PP1_F <- c(sig_pop_PP1_F_df$Row.names)
+length(genesOfInterest_pop_PP1_F)
+
+vsd <- vst(dds, blind =FALSE)
+
+####
+
+dds$combined = factor(paste0(dds$population, "-", dds$devstage, "-", dds$sex))
+dds$combined <- factor(dds$combined, levels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"), labels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"))
+
+baseMeanPerGrp <- sapply( levels(dds$combined), function(lvl) rowMeans( counts(dds,normalized=TRUE)[,dds$combined == lvl] ) )
+
+
+head(baseMeanPerGrp)
+dim(baseMeanPerGrp)
+
+# pulls out normalized counts (avg of 3 reps) for all of our significant genes
+m <- baseMeanPerGrp[genesOfInterest_pop_PP1_F, c("WA-PP1-F", "WA-PP1-M", "NC-PP1-F", "NC-PP1-M")]
+
+head(m)
+dim(m)
+
+mat_scaled = t(apply(m, 1, scale)) #gives them all mean of 0 and SD of 1
+head(mat_scaled)
+
+library(pheatmap)
+
+pheatmap(mat_scaled, labels_col = c("WA-PP1-F", "WA-PP1-M", "NC-PP1-F", "NC-PP1-M"), cluster_cols = T, cluster_rows = T)
+
+####################
+
+# Export counts to use as the input for WGCNA
+
+norm.counts <- counts(dds, normalized=TRUE)
+dim(norm.counts)
+
+write.csv(norm.counts, file = "beetle_norm_counts.csv", row.names = T, quote=F)
+
+
+
+
+
+Then we started a new R script to install the package WGCNA and look at module-trait relationships.
+
+Melissa emailed us a new file which recodes the data table to be just numerical data, not categorical like 'male' or 'female', and we put that into our library.
+
+The script is below:
+
+
+source("http://bioconductor.org/biocLite.R") 
+biocLite(c("AnnotationDbi", "impute", "GO.db", "preprocessCore")) 
+install.packages("WGCNA")
+
+library("WGCNA")
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+beetData = read.csv("beetle_norm_counts.csv")
+dim(beetData)
+head(beetData)
+names(beetData)
+
+
+bdatExpr0 = as.data.frame(t(beetData[, -c(1:1)])) #t means transpose; -c(1:1) means remove column 1
+dim(bdatExpr0)
+names(bdatExpr0)= beetData$X
+
+rownames(bdatExpr0) = names(beetData)[-c(1:1)]
+
+bgsg = goodSamplesGenes(bdatExpr0, verbose = 3) #bgsg = beetles good samples genes
+
+########### Make a cluster tree to look for outlier samples
+
+sampleTree = hclust(dist(bdatExpr0), method= "average")
+## plot
+sizeGrWindow(12,9)
+par(cex = 0.6)
+par(mar=c(0,4,2,0))
+
+plot(sampleTree, main = 'Sample clustering to detect outliers', sub="", xlab="", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
+
+
+####### Read in trait data
+
+btraitData = read.table("cols_data_noIT_num.txt", header=T)
+dim(btraitData)
+head(btraitData)
+
+###### Network construction and module detection
+
+powers = c(c(1:10), seq(from = 12, to =20, by = 2))
+#Call the network topology function
+
+sft = pickSoftThreshold(bdatExpr0, powerVector = powers, verbose=5)
+
+#Plot results
+sizeGrWindow(9,5)
+par(mfrow = c(1,2))
+cex1 = 0.9
+
+# Scale-free topology fit index as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], xlab="Soft Threshold (power)", ylab="Scale Free Topology Model Git, signed R^2", type = "n", main=paste("Scale independence"))
+
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], labels=powers, cex=1, col="red")
+
+abline(h=0.9, col="red")
+
+# mean connectivity as a function of the soft-thresholding power
+
+plot(sft$fitIndices[,1], sft$fitIndices[,5], xlab="Soft Threshold (power)", ylab = "Mean Connectivity", type = "n", main = paste("Mean connectivity"))
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1, col="red")
+
+
+#######
+
+net = blockwiseModules(bdatExpr0, power=6, TOMType = "unsigned", minModuleSize = 30, reassignThreshold = 0, mergeCutHeight = 0.25, numericLabels = T, pamRespectsDendro = F, saveTOMs = T, saveTOMFileBase = "beetleTOM", verbose = 3)
+#TOM = topology modules
+sizeGrWindow(12,9)
+mergedColors = labels2colors(net$colors)
+
+## Plot the dendrogram with the module colors underneath
+plotDendroAndColors(net$dendrograms[[1]],mergedColors[net$blockGenes[[1]]], "Module colors", dendroLables = F, hang = 0.03, addGuide = T, guideHang = 0.05)
+
+
+moduleLabels = net$colors
+moduleColors = labels2colors(net$colors)
+MEs = net$MEs #Module Eigengenes
+geneTree = net$dendrograms[[1]]
+
+### Define numbers of genes and samples
+
+nGenes = ncol(bdatExpr0)
+nSamples= nrow(bdatExpr0)
+
+MEs0 = moduleEigengenes(bdatExpr0, moduleColors)$eigengenes
+MEs = orderMEs(MEs0)
+moduleTraitCor = cor(MEs, btraitData, use = "p")
+
+moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples)
+
+sizeGrWindow(10,6)
+textMatrix = paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue,1), ")", sep = "")
+dim(textMatrix) = dim(moduleTraitCor)
+par(mar = c(6, 8.5, 3, 3))
+labeledHeatmap(Matrix = moduleTraitCor, xLabels = names(btraitData), yLabels = names(MEs), ySymbols = names(MEs), colorLabels = F, colors = greenWhiteRed(50), textMatrix = textMatrix, setStdMargins = F, cex.text = 0.5, zlim = c(-1,1), main = paste("Module-trait relationships"))
+
+------
 <div id='id-section10'/>
-### Page 10:
+### Page 10: 
+
+
+
 ------
 <div id='id-section11'/>
 ### Page 11:
