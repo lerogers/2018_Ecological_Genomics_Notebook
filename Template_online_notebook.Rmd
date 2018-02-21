@@ -29,12 +29,12 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 * [Page 1: 2018-01-24](#id-section1). Intro to Github, RMarkdown, and UNIX command-line
 * [Page 2: 2018-01-26](#id-section2). Independent practice with UNIX
 * [Page 3: 2018-01-29](#id-section3). Visualize data by creating Fast QC report
-* [Page 4:2018-01-31](#id-section4). Clean data using trimmomatic, visualize again, and create sam directory
-* [Page 5:2018-02-05](#id-section5).
-* [Page 6:](#id-section6).
-* [Page 7:](#id-section7).
-* [Page 8:](#id-section8).
-* [Page 9:](#id-section9).
+* [Page 4:2018-01-31](#id-section4). Clean data using trimmomatic, visualize again, create sam directory and align sequences
+* [Page 5:2018-02-05](#id-section5). Explore sam output, install DESeq into RStudio
+* [Page 6:2018-02-07](#id-section6). Review bash script, use DESeq in R to write code to test for differences in gene expression
+* [Page 7:2018-02-12](#id-section7). Writing R Script to test for differential gene expression
+* [Page 8:2018-02-14](#id-section8). Writing R Script
+* [Page 9:2018-02-21](#id-section9). Writing R Script, actual script is posted here
 * [Page 10:](#id-section10).
 * [Page 11:](#id-section11).
 * [Page 12:](#id-section12).
@@ -289,7 +289,7 @@ wget https://i5k.nal.usda.gov/data/Arthropoda/onttau-%28Onthophagus_taurus%29/Cu
 
 Then we talked about how we will work within the program bwa to map the directory. The professors had previously indexed the reference transcriptome with the command $ bwa index /data/project_data/beetles/reference/OTAU.fna
 
-Finally, we created a sam directory in our mydata directory. 
+Finally, we created a sam directory in our mydata directory. Then we opened up a screen and aligned our sequence that way, such that when we pressed screen -r, the program continued to run but our computer was detached from it. 
 
 [lerogers@pbio381 fastqcoutput]$ cd ~
 [lerogers@pbio381 ~]$ cd ~/mydata/
@@ -314,42 +314,33 @@ drwxr-xr-x. 2 lerogers users   10 Jan 31 11:28 sam
 <div id='id-section5'/>
 ### Page 5: 2018-02-05
 
+I am copying the review of the vim and screen tricks from the tutorial because I found them useful:
+
+Review vim and screen tricks
+vim is a text editor that can be used from the command line. It can be quite powerful for editing once you know a few tricks. We started with the basics: To open the file trim_myfile.sh
+
+vim trim_myfile.sh 
+To edit or “insert” text, type i
+
+To exit the edit mode, hit esc
+
+To save your changes, you “write” the file with :w . Note that you start all commands in vim with a colon. To quit the program, :q .
+
+screen is another fantastically useful program that allows programs or scripts to run in the background if you “detach” from the screen. To open a screen window, type screen. Now you have your command prompt and can start a script or enter a command. To “detach”, type ctrl plus a plus d . To reattach, type  screen -r and the session ID you want to enter.
 
 
-Last login: Mon Feb  5 10:53:38 on ttys000
-ip0af52781:~ Lucy$ ssh lerogers@pbio381.uvm.edu
-lerogers@pbio381.uvm.edu's password: 
-Last login: Mon Feb  5 10:53:50 2018 from ip0af52781.int.uvm.edu
-[lerogers@pbio381 ~]$ source("https://bioconductor.org/biocLite.R")
--bash: syntax error near unexpected token `"https://bioconductor.org/biocLite.R"'
-[lerogers@pbio381 ~]$ cd mydata
-[lerogers@pbio381 mydata]$ ll
-total 12
--rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
--rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
-drwxr-xr-x. 2 lerogers users 4096 Feb  5 11:16 sam
-[lerogers@pbio381 mydata]$ cd sam
-[lerogers@pbio381 sam]$ ll
-total 6221228
--rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
--rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
--rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
--rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
-[lerogers@pbio381 sam]$ source("https://bioconductor.org/biocLite.R")
--bash: syntax error near unexpected token `"https://bioconductor.org/biocLite.R"'
-[lerogers@pbio381 sam]$ Write failed: Broken pipe
-ip0af52781:~ Lucy$ 
 
+Then we explored our sam output, then tried to run the python script countexpression_PE and put the output as .txt in the myscripts folder, but it didn't work and I'm not exactly sure why.
+
+Finally, we installed DESeq into RStudio but mine failed because I have to update my computer, R, and RStudio.
 
 ------
 <div id='id-section6'/>
-### Page 6:
+### Page 6: 2018-02-07
 
-Bash script is a way to keep a record of what you do.
-I need to update this notebook.
-ip0af52781:~ Lucy$ ssh lerogers@pbio381.uvm.edu
-lerogers@pbio381.uvm.edu's password: 
-Last login: Mon Feb  5 11:28:40 2018 from ip0af52781.int.uvm.edu
+Bash script is a way to keep a record of what you do...I really should review bash, I'm still a bit unclear about it.
+
+
 [lerogers@pbio381 ~]$ cd ~/myscripts/
 [lerogers@pbio381 myscripts]$ ll
 total 12
@@ -371,15 +362,180 @@ total 16
 hello world
 [lerogers@pbio381 myscripts]$ 
 
+
+Next, we got a new clean dataset that Melissa had prepared and we switched over to R, where we wrote the code to use DESeq to test for differences in gene expression. 
+
 ------
 <div id='id-section7'/>
-### Page 7:
+### Page 7: 2018-02-12
+
+We worked on writing our R script for testing for differential gene expression
+
 ------
 <div id='id-section8'/>
-### Page 8:
+### Page 8: 2018-02-14
+More R script work
+
 ------
 <div id='id-section9'/>
-### Page 9:
+### Page 9:2018-02-21
+
+Finishing the R script. Here is the script, pasted below:
+
+# set working directory
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+library("DESeq2")
+library("ggplot2")
+
+countsTable <- read.delim('allcountsdataRN_noIT.txt',header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+countData <- as.matrix(countsTable)
+head(countData)
+
+conds <- read.delim("cols_data_noIT.txt", header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+head(conds)
+colData <- as.data.frame(conds)
+
+####################################### we've now set everything up
+
+dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ devstage + sex + population)
+# "population effect" model controlling for differences in devstage and sex. Population is listed last, so that's what it's ultimately testing for.
+
+dim(dds)
+#make note of output dimenstions: 17483, 48
+
+dds <- dds[rowSums(counts(dds)) > 1,]
+
+dim(dds)
+#new dimensions: 16851, 48. Only 632 genes lost.
+
+dds <- DESeq(dds, modelMatrixType = "standard")
+
+resultsNames(dds)
+#[1] "Intercept"           "devstage_L3L_vs_AD4" "devstage_PD1_vs_AD4"
+#[4] "devstage_PP1_vs_AD4" "sex_M_vs_F"          "population_WA_vs_NC"
+
+res <- results(dds)
+str(res)
+
+res <- res[order(res$padj),]
+head(res)
+#save output table here. use shift+command+C to put many lines as text
+
+# log2 fold change (MLE): population WA vs NC
+# Wald test p-value: population WA vs NC
+# DataFrame with 6 rows and 6 columns
+# baseMean log2FoldChange     lfcSE      stat       pvalue         padj
+# <numeric>      <numeric> <numeric> <numeric>    <numeric>    <numeric>
+#   OTAU017482-RA 126.291608     -5.4166340 0.6732174 -8.045892 8.561964e-16 1.268369e-11
+# OTAU012716-RA 188.877675      4.2644034 0.5427535  7.856980 3.935069e-15 2.914706e-11
+# OTAU008667-RA 231.871115     -0.8736955 0.1267134 -6.895051 5.384538e-12 1.994164e-08
+# OTAU012562-RA 251.774364     -0.8774079 0.1270957 -6.903520 5.072966e-12 1.994164e-08
+# OTAU013988-RA   4.416955      4.4229857 0.6836393  6.469765 9.815559e-11 2.908154e-07
+# OTAU011160-RA  10.241516     -2.5149390 0.4125305 -6.096371 1.085033e-09 2.678947e-06
+
+summary(res)
+
+# out of 16851 with nonzero total read count
+# adjusted p-value < 0.1
+# LFC > 0 (up)     : 333, 2% 
+# LFC < 0 (down)   : 282, 1.7% 
+# outliers [1]     : 85, 0.5% 
+# low counts [2]   : 1952, 12% 
+# (mean count < 1)
+# [1] see 'cooksCutoff' argument of ?results
+# [2] see 'independentFiltering' argument of ?results
+
+#FOR NEXT TIME: what model would you want to do, and how would you set it up???
+
+res_pop <- results(dds, name="population_WA_vs_NC", alpha=0.05)
+
+res_pop <- res_pop[order(res_pop$padj),]
+summary(res_pop)
+
+#################### Data Visualization
+plotMA(res_pop, main="DESeq2", ylim=c(-2,2))
+abline(h=c(-1,1), col="blue", lwd=2)
+
+# sex effect?
+
+res_sex <- results(dds, name="sex_M_vs_F", alpha=0.05)
+plotMA(res_sex, main="DESeq2", ylim=c(-4,4))
+abline(h=c(-1,1), col="blue", lwd=2)
+
+###### PCA
+rld <- rlog(dds, blind=FALSE)
+vsd <- vst(dds, blind=FALSE)
+
+data <- plotPCA(vsd, intgroup=c("population", "devstage", "sex"), returnData=TRUE)
+percentVar <- round(100 * attr(data, "percentVar"))
+
+data$devstage <- factor(data$devstage, levels=c("L3L", "PP1", "PD1", "AD4"), labels = c("L3L", "PP1", "PD1", "AD4"))
+
+pdf(file="PCA_sex_by_stage.pdf", height=5.5, width=5.5)
+ggplot(data, aes(PC1, PC2, color=sex, shape=devstage))  + 
+  geom_point(size=4, alpha=0.85) +
+  xlab(paste0("PC1: ",percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ",percentVar[2], "% variance")) +
+  theme_minimal()  
+dev.off()                        
+
+ggplot(data, aes(PC1, PC2, color=population, shape=devstage))  + 
+  geom_point(size=4, alpha=0.85) +
+  xlab(paste0("PC1: ",percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ",percentVar[2], "% variance")) +
+  theme_minimal()  
+
+
+
+
+
+
+## the next several lines will make a cluster heatmap of all the samples vs all the samples
+
+sampleDists <- dist(t(assay(rld)))
+
+library("RColorBrewer")
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(rld$devstage, rld$population, rld$sex, sep="-")
+colnames(sampleDistMatrix) <- NULL
+
+colors <- colorRampPalette(rev(brewer.pal(9,"Greens")))(255)
+
+library("pheatmap")
+
+pheatmap(sampleDistMatrix,clustering_distance_rows = sampleDists, clustering_distance_cols = sampleDists, col=colors)
+
+#In general, it's good practice to load all the libraries at the top at first, so you can run chunks of code separately
+
+#################Let's look at individual genes!!
+
+d <- plotCounts(dds, gene = "OTAU017482-RA", intgroup = (c("population","sex","devstage")), returnData=TRUE)
+d
+
+p <-ggplot(d, aes(x=devstage, y=count, shape=sex, colour = population)) +
+  theme_minimal() + theme(text = element_text(size=20), panel.grid.major=element_line(colour="grey"))
+p <- p + geom_point(position = position_jitter(w=0.3,h=0), size=3) +
+  scale_x_discrete(limits=c("L3L","PP1","PD1","AD4"))
+p
+
+################ Save outputs
+
+write.csv(res_pop, file="DGE_NCvsWA_pop_classDay6.csv", row.names = T, quote=F)
+
+
+### change pvalue to -log(pvalue) and export as .csv with rownames
+
+neglogpval <- as.matrix(-log(res_pop$pvalue))
+head(neglogpval)
+
+res_pop_negpval <- cbind(row.names(res_pop),neglogpval)
+head(res_pop_negpval)
+
+colnames(res_pop_negpval)=c("gene","neglogpval")
+
+write.csv(res_pop_negpval, file="DGE_NCvsWA_pop_neglogpval_classDay6.csv", row.names=F,quote=F)
+
 ------
 <div id='id-section10'/>
 ### Page 10:
