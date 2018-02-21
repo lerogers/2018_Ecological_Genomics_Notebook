@@ -1,5 +1,5 @@
 ## Author: Lucy Rogers     
-## Ecological Genomics:   
+## Ecological Genomics: Spring 2018
 
 ### Overall Description of notebook      
 
@@ -29,8 +29,8 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 * [Page 1: 2018-01-24](#id-section1). Intro to Github, RMarkdown, and UNIX command-line
 * [Page 2: 2018-01-26](#id-section2). Independent practice with UNIX
 * [Page 3: 2018-01-29](#id-section3). Visualize data by creating Fast QC report
-* [Page 4:](#id-section4).
-* [Page 5:](#id-section5).
+* [Page 4:2018-01-31](#id-section4). Clean data using trimmomatic, visualize again, and create sam directory
+* [Page 5:2018-02-05](#id-section5).
 * [Page 6:](#id-section6).
 * [Page 7:](#id-section7).
 * [Page 8:](#id-section8).
@@ -105,120 +105,62 @@ Other goals for today:
 
 Today, I reviewed the UNIX commands we learned on 2018-01-24. I reviewed the tutorial "Intro to connecting to unix servers and navigating the command-line" and changed the setting such that terminal will check with me before deleting a file via the rm function. Tomorrow in class, I will ask about why I cannot see my name linked under the class member page link on the course github page.
 
+The most useful UNIX commands were
+
+pwd = present working directory
+mkdir = make directory
+ll = long list
+cd = change directory
+cp filename path_to_destination = copy
+head filename = print head...can also do with tail
+grep 'word' filename = pull out all entries in file with the 'word' in them
+grep 'IT' cols_data.txt >cols_ITonly.txt = save the ITonly output in the new file
+man command = go to manual and tell me more about this command
+wc = tally up lines, words, and characters in a dataset
+rm filename = remove filename
+grep 'F' filename | wc = use pipe to apply 2nd command to 1st command
+
 
 ------
 <div id='id-section3'/>
 ### Page 3: 2018-01-29
 
-Terminal 1:
 
-Last login: Sun Jan 28 21:49:28 on ttys000
-ip0af52b37:~ Lucy$ ssh lerogers@pbio381.uvm.edu
-lerogers@pbio381.uvm.edu's password: 
-Last login: Sun Jan 28 22:01:55 2018 from ip040133.uvm.edu
+
+Today, we learned about the bull headed beetle dataset and about the RNASeq data processing 'pipeline'.
+
+First, we found our specific file within the group data file and used the zcat command to open it and the pipe command | to only show us the first 4 lines. We learned how to interpret this output data:
+1. after @ is information about the reads
+2. Then the actual sequence
+3. sometimes more info
+4. Quality data, the key is here http://www.drive5.com/usearch/manual/quality_score.html.
+
+
 [lerogers@pbio381 ~]$ cd /data/project_data/beetles/rawdata/
-[lerogers@pbio381 rawdata]$ ll
-total 18303292
--rwx------. 1 mpespeni users 1150329980 Jan 28 13:47 WA_PP1_F1_AGTCAA_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1158015986 Jan 28 13:48 WA_PP1_F1_AGTCAA_L003_R2_001.fastq.gz
--rwx------. 1 mpespeni users 1637031781 Jan 28 13:54 WA_PP1_F2_AGTTCC_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1651958363 Jan 28 13:55 WA_PP1_F2_AGTTCC_L003_R2_001.fastq.gz
--rwx------. 1 mpespeni users 1628463663 Jan 28 14:08 WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1638518365 Jan 28 14:09 WA_PP1_F3_ATGTCA_L003_R2_001.fastq.gz
--rwx------. 1 mpespeni users 1641575784 Jan 28 13:45 WA_PP1_M1_CCGTCC_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1657782742 Jan 28 13:45 WA_PP1_M1_CCGTCC_L003_R2_001.fastq.gz
--rwx------. 1 mpespeni users 1641276981 Jan 28 14:11 WA_PP1_M2_GTCCGC_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1653780352 Jan 28 14:12 WA_PP1_M2_GTCCGC_L003_R2_001.fastq.gz
--rwx------. 1 mpespeni users 1637276697 Jan 29 08:35 WA_PP1_M3_GTGAAA_L003_R1_001.fastq.gz
--rwx------. 1 mpespeni users 1646538439 Jan 29 08:36 WA_PP1_M3_GTGAAA_L003_R2_001.fastq.gz
-[lerogers@pbio381 rawdata]$ cd WA_PP1_WA_PP1_F3*
--bash: cd: WA_PP1_WA_PP1_F3*: No such file or directory
-[lerogers@pbio381 rawdata]$ cd WA_PP1_WA_PP1_F3
--bash: cd: WA_PP1_WA_PP1_F3: No such file or directory
-[lerogers@pbio381 rawdata]$ zcat WA_PP1_WA_PP1_F3 | head -n4
-gzip: WA_PP1_WA_PP1_F3.gz: No such file or directory
-[lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R
-gzip: WA_PP1_F3_ATGTCA_L003_R.gz: No such file or directory
 [lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz  | head -n4
 @CCRI0219:155:C2LNBACXX:3:1101:1226:1976 1:N:0:ATGTCA
 TGGCGCCAAAAATAAGATGGAGAAAAAGAAATTAGTTGCGCATGCTGATGTTAAGTCTCGAGACCGGTACTATTTTAAATAAAAAAAATTTTATTTGATG
 +
 B@CFFFFFDDFFHIFGGGHGFHGIIIGIGHIIIJJDHIGGIGDHHGDCGIIEGE@=DHGIGGGHFDD>>?CDDEEDDDDEEDDCDDDDDCDDDDDDEDDC
-[lerogers@pbio381 rawdata]$ zcat WA_PP1_F3_ATGTCA_L003_R1_001.^Cstq.gz 
-[lerogers@pbio381 rawdata]$ ^C
-[lerogers@pbio381 rawdata]$ ^C
-[lerogers@pbio381 rawdata]$ ^C
-[lerogers@pbio381 rawdata]$ ^V
--bash: $'\026': command not found
-[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Started analysis of WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 5% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 10% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 15% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 20% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 25% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 30% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 35% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 40% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 45% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 50% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 55% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 60% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 65% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 70% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 75% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 80% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 85% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 90% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 95% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 100% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Analysis complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Failed to process file WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-java.io.FileNotFoundException: /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.zip (Permission denied)
-	at java.io.FileOutputStream.open0(Native Method)
-	at java.io.FileOutputStream.open(FileOutputStream.java:270)
-	at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
-	at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
-	at uk.ac.babraham.FastQC.Report.HTMLReportArchive.<init>(HTMLReportArchive.java:80)
-	at uk.ac.babraham.FastQC.Analysis.OfflineRunner.analysisComplete(OfflineRunner.java:155)
-	at uk.ac.babraham.FastQC.Analysis.AnalysisRunner.run(AnalysisRunner.java:110)
-	at java.lang.Thread.run(Thread.java:748)
-[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz -o u/fastqcoutput
-Specified output directory 'u/fastqcoutput' does not exist
-[lerogers@pbio381 rawdata]$ fastqc WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz  -o ~/fastqcoutput
-Specified output directory '/users/l/e/lerogers/fastqcoutput' does not exist
+
+
+Then we used the fastqc command to visualize our data and copied it into a new directory we made called fastqcoutput: 
+
 [lerogers@pbio381 rawdata]$ cd ~
 [lerogers@pbio381 ~]$ mkdir fastqcoutput
 [lerogers@pbio381 ~]$ fastqc /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz -o ~/fastqcoutput
 Started analysis of WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
 Approx 5% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 10% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 15% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 20% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 25% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 30% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 35% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 40% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 45% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 50% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 55% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 60% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 65% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 70% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 75% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 80% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 85% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 90% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 95% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-Approx 100% complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
+...
 Analysis complete for WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz
-[lerogers@pbio381 ~]$ scp lerogers@pbio381.uvm.edu:~/fastqcoutput_fastqc.html .
 
 
+Using a second terminal window, we copied the fastqc output from the fastqcoutput folder on our home directory to a folder we created on our computers; mine is in the folder 'terminal output files' on my desktop. I did cd drag_file_symbol_here
 
-Terminal 2: 
+scp = secure copy
+ . = put it here
 
-Last login: Mon Jan 29 10:31:25 on ttys000
+Terminal window 2:
 ip0af52b37:~ Lucy$ cd /Users/Lucy/Desktop/Ecological\ Genomics\ Terminal\ Output\ files 
 ip0af52b37:Ecological Genomics Terminal Output files Lucy$ pwd
 /Users/Lucy/Desktop/Ecological Genomics Terminal Output files
@@ -232,13 +174,203 @@ ip0af52b37:Ecological Genomics Terminal Output files Lucy$
 
 ------
 <div id='id-section4'/>
-### Page 4:
+### Page 4: 2018-01-31
+
+We made a cleanreads folder on our home directory and then copied the example bash script from the group data folder to the myscripts folder on our home directory. We then opened the script using vim, which brought us to a new window on terminal. 
+
+
+[lerogers@pbio381 ~]$ cd ~/
+[lerogers@pbio381 ~]$ mkdir cleanreads
+[lerogers@pbio381 ~]$ ll
+total 4
+drwxr-xr-x. 2 lerogers users    6 Jan 31 10:21 cleanreads
+drwxr-xr-x. 2 lerogers users 4096 Jan 29 11:07 fastqcoutput
+drwxr-xr-x. 2 lerogers users   64 Jan 24 11:30 mydata
+drwxr-xr-x. 2 lerogers users    6 Jan 24 11:18 myscripts
+[lerogers@pbio381 myscripts]$ cp /data/scripts/trim_example.sh ~/myscripts/
+[lerogers@pbio381 myscripts]$ ll
+total 4
+-rwxr--r--. 1 lerogers users 780 Jan 31 10:27 trim_example.sh
+[lerogers@pbio381 myscripts]$ vim trim_example.sh
+[lerogers@pbio381 myscripts]$ ll
+total 4
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+[lerogers@pbio381 myscripts]$ vim trim_example.sh
+[lerogers@pbio381 myscripts]$ ll
+total 8
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+-rw-r--r--. 1 lerogers users 764 Jan 31 10:48 trim_F3
+[lerogers@pbio381 myscripts]$ ll
+total 8
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+-rw-r--r--. 1 lerogers users 764 Jan 31 10:48 trim_F3
+[lerogers@pbio381 myscripts]$ vim trim_example.sh
+[lerogers@pbio381 myscripts]$ ll
+total 12
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+-rw-r--r--. 1 lerogers users 764 Jan 31 10:48 trim_F3
+-rw-r--r--. 1 lerogers users 764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ rm trim_F3
+rm: remove regular file ‘trim_F3’? yes
+[lerogers@pbio381 myscripts]$ ll
+total 8
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+-rw-r--r--. 1 lerogers users 764 Jan 31 10:49 trim_F3.sh
+
+
+
+Now, we ran the trimmomatic script by first using chmod, which allowed us to change the permissions so that the 'user' could 'execute' the script, then ran the command ./trim_F3.sh which told it to run. 
+
+[lerogers@pbio381 myscripts]$ chmod u+x trim_F3.sh
+[lerogers@pbio381 myscripts]$ ll
+total 8
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:43 trim_example.sh
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ vim trim_f3.sh
+[lerogers@pbio381 myscripts]$ vim trim_F3.sh
+[lerogers@pbio381 myscripts]$ rm trim_example.sh
+rm: remove regular file ‘trim_example.sh’? yes
+[lerogers@pbio381 myscripts]$ ll
+total 4
+-rwxr--r--. 1 lerogers users 764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ ./trim_F3.sh
+TrimmomaticPE: Started with arguments: -threads 1 -phred33 /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R1_001.fastq.gz /data/project_data/beetles/rawdata/WA_PP1_F3_ATGTCA_L003_R2_001.fastq.gz /users/l/e/lerogers/cleanreads/WA_PP1_F3_R1_clean_paired.fa /users/l/e/lerogers/cleanreads/WA_PP1_F3_R1_clean_unpaired.fa /users/l/e/lerogers/cleanreads/WA_PP1_F3_R2_clean_paired.fa /users/l/e/lerogers/cleanreads/WA_PP1_F3_R2_clean_unpaired.fa ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 LEADING:28 TRAILING:28 SLIDINGWINDOW:6:28 HEADCROP:12 MINLEN:35
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Read Pairs: 16000000 Both Surviving: 11356978 (70.98%) Forward Only Surviving: 1897057 (11.86%) Reverse Only Surviving: 800823 (5.01%) Dropped: 1945142 (12.16%)
+TrimmomaticPE: Completed successfully
+[lerogers@pbio381 myscripts]$ cd ~/cleanreads/
+[lerogers@pbio381 cleanreads]$ ll
+total 5548308
+-rw-r--r--. 1 lerogers users 2590374644 Jan 31 10:59 WA_PP1_F3_R1_clean_paired.fa
+-rw-r--r--. 1 lerogers users  369021891 Jan 31 10:59 WA_PP1_F3_R1_clean_unpaired.fa
+-rw-r--r--. 1 lerogers users 2562494874 Jan 31 10:59 WA_PP1_F3_R2_clean_paired.fa
+-rw-r--r--. 1 lerogers users  159565225 Jan 31 10:59 WA_PP1_F3_R2_clean_unpaired.fa
+
+
+Now, finally, we ran fastqc again to visualize after trimming, placing the final output in our fastqc file: 
+
+[lerogers@pbio381 cleanreads]$ fastqc ~/cleanreads/WA_PP1_F3_R1_clean_paired.fa -o ~/fastqcoutput/
+Started analysis of WA_PP1_F3_R1_clean_paired.fa
+Approx 5% complete for WA_PP1_F3_R1_clean_paired.fa
+...
+Analysis complete for WA_PP1_F3_R1_clean_paired.fa
+[lerogers@pbio381 cleanreads]$ cd ~/
+[lerogers@pbio381 ~]$ ll
+total 8
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 10:55 cleanreads
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 11:10 fastqcoutput
+drwxr-xr-x. 2 lerogers users   64 Jan 24 11:30 mydata
+drwxr-xr-x. 2 lerogers users   31 Jan 31 10:54 myscripts
+[lerogers@pbio381 ~]$ cd fastqcoutput/
+[lerogers@pbio381 fastqcoutput]$ ll
+total 1384
+-rw-r--r--. 1 lerogers users 339080 Jan 29 11:07 WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.html
+-rw-r--r--. 1 lerogers users 438237 Jan 29 11:07 WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.zip
+-rw-r--r--. 1 lerogers users 285373 Jan 31 11:10 WA_PP1_F3_R1_clean_paired.fa_fastqc.html
+-rw-r--r--. 1 lerogers users 349105 Jan 31 11:10 WA_PP1_F3_R1_clean_paired.fa_fastqc.zip
+
+
+And copied it to our computer in a second terminal window:
+
+Second terminal window: 
+Last login: Wed Jan 31 10:57:21 on ttys001
+ip0af527d2:~ Lucy$ cd /Users/Lucy/Desktop/Ecological\ Genomics\ Terminal\ Output\ files 
+ip0af527d2:Ecological Genomics Terminal Output files Lucy$ scp lerogers@pbio381.uvm.edu:~/fastqcoutput/*html .
+lerogers@pbio381.uvm.edu's password: 
+WA_PP1_F3_ATGTCA_L003_R1_001_fastqc.html      100%  331KB 331.1KB/s   00:00    
+WA_PP1_F3_R1_clean_paired.fa_fastqc.html      100%  279KB 278.7KB/s   00:00    
+ip0af527d2:Ecological Genomics Terminal Output files Lucy$ 
+
+
+Back to first terminal window, we next mapped our reads to the reference transcriptome. It had already been previously downloaded to the directory from a website using the following commands: 
+cd /data/project_data/beetles/reference/
+wget https://i5k.nal.usda.gov/data/Arthropoda/onttau-%28Onthophagus_taurus%29/Current%20Genome%20Assembly/2.Official%20or%20Primary%20Gene%20Set/BCM_version_0.5.3/consensus_gene_set/OTAU.fna
+
+Then we talked about how we will work within the program bwa to map the directory. The professors had previously indexed the reference transcriptome with the command $ bwa index /data/project_data/beetles/reference/OTAU.fna
+
+Finally, we created a sam directory in our mydata directory. 
+
+[lerogers@pbio381 fastqcoutput]$ cd ~
+[lerogers@pbio381 ~]$ cd ~/mydata/
+[lerogers@pbio381 mydata]$ mkdir sam
+[lerogers@pbio381 mydata]$ ll
+total 8
+-rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
+-rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
+drwxr-xr-x. 2 lerogers users   10 Jan 31 11:28 sam
+[lerogers@pbio381 mydata]$ cd sam
+[lerogers@pbio381 sam]$ screen
+[screen is terminating]
+[lerogers@pbio381 sam]$ screen
+[detached from 53787.pts-6.pbio381]
+[lerogers@pbio381 sam]$ screen -r
+[detached from 53787.pts-6.pbio381]
+[lerogers@pbio381 sam]$ 
+
+
+
 ------
 <div id='id-section5'/>
-### Page 5:
+### Page 5: 2018-02-05
+
+
+
+Last login: Mon Feb  5 10:53:38 on ttys000
+ip0af52781:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Mon Feb  5 10:53:50 2018 from ip0af52781.int.uvm.edu
+[lerogers@pbio381 ~]$ source("https://bioconductor.org/biocLite.R")
+-bash: syntax error near unexpected token `"https://bioconductor.org/biocLite.R"'
+[lerogers@pbio381 ~]$ cd mydata
+[lerogers@pbio381 mydata]$ ll
+total 12
+-rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
+-rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
+drwxr-xr-x. 2 lerogers users 4096 Feb  5 11:16 sam
+[lerogers@pbio381 mydata]$ cd sam
+[lerogers@pbio381 sam]$ ll
+total 6221228
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ source("https://bioconductor.org/biocLite.R")
+-bash: syntax error near unexpected token `"https://bioconductor.org/biocLite.R"'
+[lerogers@pbio381 sam]$ Write failed: Broken pipe
+ip0af52781:~ Lucy$ 
+
+
 ------
 <div id='id-section6'/>
 ### Page 6:
+
+Bash script is a way to keep a record of what you do.
+I need to update this notebook.
+ip0af52781:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Mon Feb  5 11:28:40 2018 from ip0af52781.int.uvm.edu
+[lerogers@pbio381 ~]$ cd ~/myscripts/
+[lerogers@pbio381 myscripts]$ ll
+total 12
+-rwxr--r--. 1 lerogers users 6487 Feb  5 11:18 countxpression_PE.py
+-rwxr--r--. 1 lerogers users  764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ vim test_bash
+[lerogers@pbio381 myscripts]$ ll
+total 16
+-rwxr--r--. 1 lerogers users 6487 Feb  5 11:18 countxpression_PE.py
+-rw-r--r--. 1 lerogers users   33 Feb  7 10:30 test_bash
+-rwxr--r--. 1 lerogers users  764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ chmod u+x test_bash 
+[lerogers@pbio381 myscripts]$ ll
+total 16
+-rwxr--r--. 1 lerogers users 6487 Feb  5 11:18 countxpression_PE.py
+-rwxr--r--. 1 lerogers users   33 Feb  7 10:30 test_bash
+-rwxr--r--. 1 lerogers users  764 Jan 31 10:49 trim_F3.sh
+[lerogers@pbio381 myscripts]$ ./test_bash 
+hello world
+[lerogers@pbio381 myscripts]$ 
+
 ------
 <div id='id-section7'/>
 ### Page 7:
