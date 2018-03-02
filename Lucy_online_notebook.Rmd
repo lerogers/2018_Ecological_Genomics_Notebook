@@ -35,7 +35,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 * [Page 7:2018-02-12](#id-section7). Writing R Script to test for differential gene expression
 * [Page 8:2018-02-14](#id-section8). Writing R Script, actual script is posted here
 * [Page 9:2018-02-21](#id-section9). Writing R Script
-* [Page 10:](#id-section10).
+* [Page 10: 2018-02-26](#id-section10).Intro to SNP and Genotype Calling
 * [Page 11:](#id-section11).
 * [Page 12:](#id-section12).
 * [Page 13:](#id-section13).
@@ -755,13 +755,503 @@ labeledHeatmap(Matrix = moduleTraitCor, xLabels = names(btraitData), yLabels = n
 
 ------
 <div id='id-section10'/>
-### Page 10: 
+### Page 10: 2-26-2018: Intro to SNP and Genotype Calling
+
+Right now our sam file is human readable, we are going to write a bash script so we can let it run without us babysitting it and put it into bam. My sam file is called WA_PP1_F3_bwamem.sam and is in my sam folder, inside my mydata folder.
+
+Once we open up vim, we type i to start typing and then #! to tell it how to interpret what we are saying.  Here is the script: 
+
+
+
+#!/bin/bash
+
+#Convert sam file to binary bam format
+
+samtools view -b -@ 4 WA_PP1_F3_bwamem.sam -o WA_PP1_F3_bwamem.bam
+
+# Check stats on our alignment
+
+samtools flagstat WA_PP1_F3_bwamem.bam
+
+samtools depth WA_PP1_F3_bwamem.bam
+
+# Fix mate pairs between paired end reads that have been orphaned
+
+samtools fixmate WA_PP1_F3_bwamem.bam WA_PP1_F3_bwamem.fixmate.bam
+
+# Sort the alignments
+samtools sort -@ 4 WA_PP1_F3_bwamem.fixmate.bam WA_PP1_F3_bwamem.fixmate.sorted.bam
+
+# Remove PCR duplicates
+#We are not actually doing this for time's sake, but here's what it would look like:
+# samtools rmdup WA_PP1_F3_bwamem.fixmate.sorted.bam WA_PP1_F3_bwamem.fixmate.sorted.rmdup.bam
+
+# Index our final alignment for fast processing
+
+samtools index WA_PP1_F3_bwamem.fixmate.sorted.bam
+
+# Pause here; look at the results before proceeding to SNP calling
+
+
+
+then we did esc to leave insert mode, and :w with the name to name/save, and :q to quit. The script was then saved to my sam folder, which is inside my mydata folder.  We made it executable by adding chmod o+x CallSNPs.sh 
+
+Then, we typed 'screen' to enter a new screen and run the bash script by typing 
+bash CallSNPs.sh 
+We got no response and no command prompt, so we know it's running. So we detach with ctr-a-d
+
+
+Here's the whole script from today:
+
+Last login: Wed Feb 21 01:05:17 on ttys000
+ip0af52072:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Wed Feb 21 01:05:32 2018 from ip040077.uvm.edu
+[lerogers@pbio381 ~]$ ll
+total 8
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 10:55 cleanreads
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 11:10 fastqcoutput
+drwxr-xr-x. 3 lerogers users   78 Jan 31 11:28 mydata
+drwxr-xr-x. 2 lerogers users   82 Feb  7 10:30 myscripts
+[lerogers@pbio381 ~]$ cd mydata
+[lerogers@pbio381 mydata]$ ll
+total 12
+-rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
+-rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
+drwxr-xr-x. 2 lerogers users 4096 Feb  5 11:16 sam
+[lerogers@pbio381 mydata]$ vim
+[lerogers@pbio381 mydata]$ cd sam
+[lerogers@pbio381 sam]$ ll
+total 6221228
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ head WA_PP1_F3_bwamem.sam
+@SQ	SN:OTAU000001-RA	LN:3192
+@SQ	SN:OTAU000002-RA	LN:4557
+@SQ	SN:OTAU000003-RA	LN:1051
+@SQ	SN:OTAU000004-RA	LN:735
+@SQ	SN:OTAU000005-RA	LN:456
+@SQ	SN:OTAU000006-RA	LN:996
+@SQ	SN:OTAU000007-RA	LN:261
+@SQ	SN:OTAU000008-RA	LN:15102
+@SQ	SN:OTAU000009-RA	LN:3352
+@SQ	SN:OTAU000010-RA	LN:6187
+[lerogers@pbio381 sam]$ vim
+
+
+
+
+[lerogers@pbio381 sam]$ ll
+total 6221232
+-rw-r--r--. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ ch mod o+x CallSNPs.sh 
+-bash: ch: command not found
+[lerogers@pbio381 sam]$ chmod o+x CallSNPs.sh 
+[lerogers@pbio381 sam]$ ll
+total 6221232
+-rw-r--r-x. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ screen
+[detached from 128482.pts-5.pbio381]
+[lerogers@pbio381 sam]$ top
+
+top - 11:10:43 up 34 days, 19:30,  7 users,  load average: 6.84, 5.28, 2.28
+Tasks: 330 total,   7 running, 323 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 20.4 us,  0.8 sy,  0.0 ni, 78.3 id,  0.4 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem : 32764504 total,   221872 free,   474100 used, 32068532 buff/cache
+KiB Swap:  2097148 total,  2095348 free,     1800 used. 31607496 avail Mem 
+
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                
+128786 msouthga  20   0   25100   2628    876 R 100.0  0.0   1:22.80 samtools                               
+128763 srkeller  20   0   25108   2640    888 R 100.0  0.0   2:00.40 samtools                               
+128782 pcronin1  20   0   24968   2628    876 R 100.0  0.0   1:23.77 samtools                               
+128784 lerogers  20   0   25100   2628    876 R 100.0  0.0   1:23.10 samtools                               
+128780 eathibau  20   0   25100   2628    876 R  99.3  0.0   1:29.42 samtools                               
+ 34800 root      20   0       0      0      0 S   6.0  0.0   0:16.56 kworker/u256:2                         
+ 75822 root      20   0       0      0      0 S   1.3  0.0   0:19.01 kworker/1:2                            
+   140 root      20   0       0      0      0 S   0.7  0.0  21:53.00 kswapd0                                
+ 24396 root      20   0       0      0      0 S   0.3  0.0   0:17.24 kworker/0:1                            
+128788 srkeller  20   0  159948   2440   1560 S   0.3  0.0   0:00.17 top                                    
+128792 lerogers  20   0  159956   2484   1564 R   0.3  0.0   0:00.10 top                                    
+     1 root      20   0  193580   5860   3296 S   0.0  0.0   3:55.49 systemd                                
+     2 root      20   0       0      0      0 S   0.0  0.0   0:06.62 kthreadd                               
+     3 root      20   0       0      0      0 S   0.0  0.0   0:03.37 ksoftirqd/0                            
+     5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/0:0H                           
+     7 root      rt   0       0      0      0 S   0.0  0.0   0:00.94 migration/0                            
+     8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcu_bh                                 
+     9 root      20   0       0      0      0 R   0.0  0.0  10:55.70 rcu_sched                              
+    10 root      rt   0       0      0      0 S   0.0  0.0   0:05.35 watchdog/0                             
+    11 root      rt   0       0      0      0 S   0.0  0.0   0:08.71 watchdog/1                             
+    12 root      rt   0       0      0      0 S   0.0  0.0   0:01.63 migration/1                            
+    13 root      20   0       0      0      0 S   0.0  0.0   0:00.61 ksoftirqd/1                            
+    15 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/1:0H                           
+    16 root      rt   0       0      0      0 S   0.0  0.0   0:07.25 watchdog/2                             
+    17 root      rt   0       0      0      0 S   0.0  0.0   0:02.14 migration/2                            
+    18 root      20   0       0      0      0 S   0.0  0.0   0:00.53 ksoftirqd/2                            
+    20 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/2:0H                           
+    21 root      rt   0       0      0      0 S   0.0  0.0   0:07.98 watchdog/3                             
+    22 root      rt   0       0      0      0 S   0.0  0.0   0:01.74 migration/3                            
+    23 root      20   0       0      0      0 S   0.0  0.0   0:00.49 ksoftirqd/3                            
+    25 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/3:0H                           
+    26 root      rt   0       0      0      0 S   0.0  0.0   0:06.61 watchdog/4                             
+[lerogers@pbio381 sam]$ ll
+total 9245240
+-rw-r--r-x. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users  584278169 Feb 26 11:10 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ vi CallSNPs.sh 
+[lerogers@pbio381 sam]$ screen -r
+[detached from 128482.pts-5.pbio381]
+[lerogers@pbio381 sam]$ samtools sort -@ 4 WA_PP1_F3_bwamem.fixmate.bam  -o bash CallSNPs.sh 
+[bam_sort] Use -T PREFIX / -o FILE to specify temporary and final output files
+Usage: samtools sort [options...] [in.bam]
+Options:
+  -l INT     Set compression level, from 0 (uncompressed) to 9 (best)
+  -m INT     Set maximum memory per thread; suffix K/M/G recognized [768M]
+  -n         Sort by read name
+  -o FILE    Write final output to FILE rather than standard output
+  -T PREFIX  Write temporary files to PREFIX.nnnn.bam
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+  -O, --output-fmt FORMAT[,OPT[=VAL]]...
+               Specify output format (SAM, BAM, CRAM)
+      --output-fmt-option OPT[=VAL]
+               Specify a single output file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+  -@, --threads INT
+               Number of additional threads to use [0]
+[lerogers@pbio381 sam]$ 
+[lerogers@pbio381 sam]$ samtools sort -@ 4 WA_PP1_F3_bwamem.fixmate.bam  -o WA_PP1_F1.fixmate.sorted.vam
+[bam_sort_core] merging from 12 files...
+[lerogers@pbio381 sam]$ ll
+total 11681652
+-rw-r--r-x. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.vam
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ samtools index WA_PP1_F1.fixmate.sorted.vam
+[lerogers@pbio381 sam]$ ll
+total 11682908
+-rw-r--r-x. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.vam
+-rw-r--r--. 1 lerogers users    1282176 Feb 26 11:21 WA_PP1_F1.fixmate.sorted.vam.bai
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ samtools tview WA_PP1_F1.fixmate.sorted.vam
+[lerogers@pbio381 sam]$ samtools tview WA_PP1_F1.fixmate.sorted.vam
+[lerogers@pbio381 sam]$ samtools tview WA_PP1_F1.fixmate.sorted.vam /data/project_data/beetles/reference/OTAU.fna
+[lerogers@pbio381 sam]$ 
+
+
 
 
 
 ------
 <div id='id-section11'/>
-### Page 11:
+### Page 11: 2018-2-28: Diversity and Site Frequency Spectrum (SFS)
+
+In vim text editor, use :wq to write your script and then quit; essentially to save the edits.
+
+In vim when looking at output, use :set nowrap to see the data and :1900 to get below the header.
+
+The genotype sites that have no data is because it didn't pass the min DP = 5 or the min GP = 0.9 threshholds.
+
+We are using files that are in the common space, but outputting files into our home space. For future reference, this is the directory where the data live: /data/project_data/beetles/snps
+
+
+Then we use the program vcftools to work with the data on our site
+
+We use bi-allelic filter to look at only bi-allelic sites
+
+Setting minGQ to 10 didn't get rid of any results, it just set the lower quality ones to missing data, shown by a dot, instead of getting rid of them. So now we look at what % at a site have information that has passed the quality filter
+
+max-missing 0.8 means it only allows SNPs with at least 80% of the data present
+
+maf = minor allele frequency filter
+
+last thing we did was save a new file after we'd filtered out these filters
+
+So now we saved the vcf output file to our home directory in the myresults file.
+
+Last login: Mon Feb 26 10:42:52 on ttys001
+ip0af5234b:~ Lucy$ lerogers@pbio381.uvm.edu
+-bash: lerogers@pbio381.uvm.edu: command not found
+ip0af5234b:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Mon Feb 26 10:41:46 2018 from ip0af52072.int.uvm.edu
+[lerogers@pbio381 ~]$ cd ~/mydata
+[lerogers@pbio381 mydata]$ ll
+total 12
+-rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
+-rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
+drwxr-xr-x. 2 lerogers users 4096 Feb 26 11:21 sam
+[lerogers@pbio381 mydata]$ cd sam/
+[lerogers@pbio381 sam]$ ll
+total 11682908
+-rw-r--r-x. 1 lerogers users        848 Feb 26 11:03 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.vam
+-rw-r--r--. 1 lerogers users    1282176 Feb 26 11:21 WA_PP1_F1.fixmate.sorted.vam.bai
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ samtools flagstat WA_PP1_F1.fixmate.sorted.vam
+22793375 + 0 in total (QC-passed reads + QC-failed reads)
+0 + 0 secondary
+79419 + 0 supplementary
+0 + 0 duplicates
+18462048 + 0 mapped (81.00% : N/A)
+22713956 + 0 paired in sequencing
+11356978 + 0 read1
+11356978 + 0 read2
+17527234 + 0 properly paired (77.17% : N/A)
+17965134 + 0 with itself and mate mapped
+417495 + 0 singletons (1.84% : N/A)
+310662 + 0 with mate mapped to a different chr
+261021 + 0 with mate mapped to a different chr (mapQ>=5)
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ bash CallSNPs.sh 
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Could not parse tag "" in "AD,"
+Failed to open -: unknown file type
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ bash CallSNPs.sh 
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Could not parse tag "" in "AD,"
+Failed to open -: unknown file type
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ ll
+total 11682908
+-rw-r--r-x. 1 lerogers users       1289 Feb 28 10:46 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.vam
+-rw-r--r--. 1 lerogers users    1282176 Feb 26 11:21 WA_PP1_F1.fixmate.sorted.vam.bai
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+-rw-r--r--. 1 lerogers users          0 Feb 28 10:46 WA_PP1_F3.vcf
+[lerogers@pbio381 sam]$ mv WA_PP1_F1.fixmate.sorted.vam WA_PP1_F1.fixmate.sorted.bam
+[lerogers@pbio381 sam]$ ll
+total 11682908
+-rw-r--r-x. 1 lerogers users       1289 Feb 28 10:46 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.bam
+-rw-r--r--. 1 lerogers users    1282176 Feb 26 11:21 WA_PP1_F1.fixmate.sorted.vam.bai
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+-rw-r--r--. 1 lerogers users          0 Feb 28 10:46 WA_PP1_F3.vcf
+[lerogers@pbio381 sam]$ bash CallSNPs.sh
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Could not parse tag "" in "AD,"
+Failed to open -: unknown file type
+[lerogers@pbio381 sam]$ mv WA_PP1_F1.fixmate.sorted.vam.bai WA_PP1_F1.fixmate.sorted.bam.bai
+[lerogers@pbio381 sam]$ bash CallSNPs.sh 
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Could not parse tag "" in "AD,"
+Failed to open -: unknown file type
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ bash CallSNPs.sh 
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 1 samples in 1 input files
+[lerogers@pbio381 sam]$ ll
+total 11724832
+-rw-r--r-x. 1 lerogers users       1288 Feb 28 10:50 CallSNPs.sh
+-rw-r--r--. 1 lerogers users        195 Feb  5 11:17 countstatsummary.txt
+-rw-r--r--. 1 lerogers users      27155 Feb  5 10:51 tail.sam
+-rw-r--r--. 1 lerogers users 1497739702 Feb 26 11:19 WA_PP1_F1.fixmate.sorted.bam
+-rw-r--r--. 1 lerogers users    1282176 Feb 26 11:21 WA_PP1_F1.fixmate.sorted.bam.bai
+-rw-r--r--. 1 lerogers users 2022906003 Feb 26 11:08 WA_PP1_F3_bwamem.bam
+-rw-r--r--. 1 lerogers users     349720 Feb  5 11:17 WA_PP1_F3_bwamem_counts.txt
+-rw-r--r--. 1 lerogers users 2070814941 Feb 26 11:14 WA_PP1_F3_bwamem.fixmate.bam
+-rw-r--r--. 1 lerogers users 6370145913 Jan 31 12:02 WA_PP1_F3_bwamem.sam
+-rw-r--r--. 1 lerogers users   42928107 Feb 28 11:03 WA_PP1_F3.vcf
+[lerogers@pbio381 sam]$ vim WA_PP1_F3.vcf
+[lerogers@pbio381 sam]$ vim WA_PP1_F3.vcf
+[lerogers@pbio381 sam]$ vim CallSNPs.sh 
+[lerogers@pbio381 sam]$ cd /data/project_data/beetles/snps
+[lerogers@pbio381 snps]$ ll
+total 6369252
+-rw-r--r--. 1 srkeller users 4980896352 Feb 27 11:06 OTAU_2018_reads2snps.fas
+-rw-r--r--. 1 srkeller users  215746604 Feb 27 13:24 OTAU_2018_reads2snps.vcf
+-rw-r--r--. 1 srkeller users 1325465210 Feb 27 16:51 OTAU_2018_samtools.vcf
+[lerogers@pbio381 snps]$ tail OTAU_2018_samtools.vcf 
+OTAU017482-RA	806	.	C	A	19.8295	.	DP=219;VDB=0.0665622;SGB=-0.118132;RPB=0.138686;MQB=0.00336062;MQSB=0.911687;BQB=0.0212898;MQ0F=0;ICB=0.00120955;HOB=0.00059453;AC=1;AN=58;DP4=95,116,1,3;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,140:5:5,0:0,26,169:26	0/0:0,27,253:9:9,0:0,38,282:38	0/0:0,3,40:1:1,0:0,14,69:14	0/0:0,27,255:9:9,0:0,38,284:38	0/0:0,42,255:14:14,0:0,53,284:53	0/0:11,0,33:2:1,1:2,3,53:3	0/0:0,3,29:1:1,0:0,14,58:14	0/0:0,3,17:1:1,0:0,14,46:14	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,29:1:1,0:0,14,58:14	0/0:0,27,255:9:9,0:0,38,284:38	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,41:1:1,0:0,14,70:14	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,140:4:4,0:0,23,169:23	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,33:1:1,0:0,14,62:14	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,6,81:2:2,0:0,17,110:17	0/0:0,12,124:4:4,0:0,23,153:23	0/0:0,3,39:1:1,0:0,14,68:14	0/0:0,27,215:9:9,0:0,38,244:38	0/1:58,0,32:3:1,2:46,0,49:44	0/0:0,12,143:4:4,0:0,23,172:23	0/0:0,9,109:3:3,0:0,20,138:20	0/0:0,172,255:57:57,0:0,183,284:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,18,180:6:6,0:0,29,209:29	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,5,97:4:3,1:0,16,126:16	0/0:0,21,214:7:7,0:0,32,243:32	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,78,255:26:26,0:0,89,284:89	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,254:10:10,0:0,41,283:41	0/0:0,12,136:4:4,0:0,23,165:23	0/0:0,9,113:3:3,0:0,20,142:20	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,42,255:14:14,0:0,53,284:53	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	857	.	G	A	14.3303	.	DP=244;VDB=0.732596;SGB=0.336893;RPB=0.818184;MQB=0.0120429;MQSB=0.971034;BQB=0.325725;MQ0F=0;ICB=0.00638978;HOB=0.00295858;AC=2;AN=52;DP4=160,59,3,0;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,24,255:8:8,0:0,31,276:31	0/0:0,18,183:6:6,0:0,25,204:25	0/0:0,3,41:1:1,0:0,11,62:11	0/0:0,39,255:13:13,0:0,46,276:46	0/0:0,51,255:17:17,0:0,58,276:58	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:53,6,0:2:0,2:39,0,8:8	0/0:0,27,206:9:9,0:0,34,227:34	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:23,3,0:1:0,1:12,0,11:9	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,35:1:1,0:0,11,56:11	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,33:1:1,0:0,11,54:11	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,117:3:3,0:0,16,138:16	0/0:0,6,68:2:2,0:0,13,89:13	0/0:0,9,102:3:3,0:0,16,123:16	0/0:0,15,152:5:5,0:0,22,173:22	0/0:0,12,133:4:4,0:0,19,154:19	0/0:0,24,224:8:8,0:0,31,245:31	0/0:0,6,70:2:2,0:0,13,91:13	0/0:0,163,255:54:54,0:0,170,276:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,27,255:9:9,0:0,34,276:34	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,168:5:5,0:0,22,189:22	0/0:0,33,255:11:11,0:0,40,276:40	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,69,255:23:23,0:0,76,276:76	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,188:10:10,0:0,37,209:37	0/0:0,21,207:7:7,0:0,28,228:28	0/0:0,21,167:7:7,0:0,28,188:28	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,37,276:37	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	875	.	C	T	19.0242	.	DP=248;VDB=0.89732;SGB=-0.118132;RPB=0.990534;MQB=0.00284808;MQSB=0.934507;BQB=0.839131;MQ0F=0;ICB=0.014069;HOB=0.00617284;AC=3;AN=54;DP4=136,75,3,1;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,21,221:7:7,0:0,27,239:27	0/0:0,15,164:5:5,0:0,21,182:21	0/0:0,6,78:2:2,0:0,12,96:12	0/0:0,36,255:12:12,0:0,42,273:42	0/0:0,36,255:12:12,0:0,42,273:42	0/1:18,3,0:1:0,1:9,0,10:6	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:53,6,0:2:0,2:41,0,7:7	0/0:0,21,213:7:7,0:0,27,231:27	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:23,3,0:1:0,1:14,0,9:8	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,35:1:1,0:0,9,53:9	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,35:1:1,0:0,9,53:9	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,109:3:3,0:0,15,127:15	0/0:0,9,91:3:3,0:0,15,109:15	0/0:0,9,119:3:3,0:0,15,137:15	0/0:0,18,151:6:6,0:0,24,169:24	0/0:0,9,113:3:3,0:0,15,131:15	0/0:0,27,254:9:9,0:0,33,272:33	0/0:0,6,70:2:2,0:0,12,88:12	0/0:0,141,255:47:47,0:0,147,273:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,27,255:9:9,0:0,33,273:33	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,21,234:7:7,0:0,27,252:27	0/0:0,39,255:13:13,0:0,45,273:45	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,75,255:25:25,0:0,81,273:81	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,39,255:13:13,0:0,45,273:45	0/0:0,21,238:7:7,0:0,27,256:27	0/0:0,21,172:7:7,0:0,27,190:27	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,21,203:7:7,0:0,27,221:27	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1024	.	A	T	89	.	DP=241;VDB=0.127985;SGB=11.0361;RPB=0.941479;MQB=0.00360482;MQSB=0.998372;BQB=0.959379;MQ0F=0;ICB=0.00193141;HOB=0.00094518;AC=1;AN=46;DP4=140,62,3,1;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,40,281:40	0/0:0,18,197:6:6,0:0,28,223:28	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,45,255:15:15,0:0,55,281:55	0/0:0,33,255:11:11,0:0,43,281:43	0/1:140,12,0:4:0,4:118,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,132:4:4,0:0,22,158:22	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,35:1:1,0:0,13,62:13	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,145:4:4,0:0,22,171:22	0/0:0,3,29:1:1,0:0,13,56:13	0/0:0,18,202:6:6,0:0,28,228:28	0/0:0,24,231:8:8,0:0,34,257:34	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,144:4:4,0:0,22,170:22	0/0:0,12,140:4:4,0:0,22,166:22	0/0:0,148,255:49:49,0:0,158,281:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,40,281:40	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,147:5:5,0:0,25,173:25	0/0:0,15,164:5:5,0:0,25,190:25	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,45,255:15:15,0:0,55,281:55	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,48,255:16:16,0:0,58,281:58	0/0:0,18,185:6:6,0:0,28,211:28	0/0:0,24,194:8:8,0:0,34,220:34	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,35:1:1,0:0,13,62:13	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,39,255:13:13,0:0,49,281:49	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1103	.	C	T	62	.	DP=244;VDB=0.740842;SGB=11.8527;RPB=0.929623;MQB=0.0061008;MQSB=0.999998;BQB=0.979407;MQ0F=0;ICB=0.00163197;HOB=0.0008;AC=1;AN=50;DP4=111,120,0,4;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,27,251:9:9,0:0,37,278:37	0/0:0,24,240:8:8,0:0,34,267:34	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,42,255:14:14,0:0,52,282:52	0/0:0,42,255:14:14,0:0,52,282:52	0/1:114,12,0:4:0,4:92,1,6:6	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,24,237:8:8,0:0,34,264:34	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,6,90:2:2,0:0,16,117:16	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,121:4:4,0:0,22,148:22	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,18,182:6:6,0:0,28,209:28	0/0:0,6,74:2:2,0:0,16,101:16	0/0:0,27,255:9:9,0:0,37,282:37	0/0:0,33,255:11:11,0:0,43,282:43	0/0:0,12,112:4:4,0:0,22,139:22	0/0:0,24,222:8:8,0:0,34,249:34	0/0:0,6,91:2:2,0:0,16,118:16	0/0:0,154,255:51:51,0:0,164,282:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,33,255:11:11,0:0,43,282:43	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,139:4:4,0:0,22,166:22	0/0:0,21,207:7:7,0:0,31,234:31	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,63,255:21:21,0:0,73,282:73	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,51,255:17:17,0:0,61,282:61	0/0:0,12,120:4:4,0:0,22,147:22	0/0:0,18,190:6:6,0:0,28,217:28	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,3,36:1:1,0:0,13,63:13	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,24,241:8:8,0:0,34,268:34	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1136	.	T	C	521	.	DP=247;VDB=0.0192071;SGB=53.3482;RPB=0.937648;MQB=1.94112e-13;MQSB=0.950755;BQB=0.174714;MQ0F=0;ICB=0.295805;HOB=0.135417;AC=6;AN=48;DP4=96,98,14,11;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,24,221:8:8,0:0,27,234:27	1/1:248,27,0:9:0,9:234,17,0:17	./.:0,0,0:0:0,0:0,0,0:0	1/1:255,36,0:12:0,12:241,26,0:26	0/0:0,36,255:12:12,0:0,39,268:39	0/1:58,6,0:2:0,2:49,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,149:5:5,0:0,19,163:19	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:63,6,0:2:0,2:54,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,27,255:9:9,0:0,30,268:30	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,139:4:4,0:0,16,153:16	0/0:0,9,97:3:3,0:0,13,111:13	0/0:0,21,231:7:7,0:0,24,244:24	0/0:0,30,255:10:10,0:0,33,268:33	0/0:0,12,129:4:4,0:0,16,143:16	0/0:0,24,250:8:8,0:0,27,263:27	0/0:0,6,64:2:2,0:0,10,78:10	0/0:0,129,255:43:43,0:0,132,268:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,21,209:7:7,0:0,24,222:24	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,98:3:3,0:0,13,112:13	0/0:0,9,98:3:3,0:0,13,112:13	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,93,255:31:31,0:0,96,268:96	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,51,255:17:17,0:0,54,268:54	0/0:0,3,34:1:1,0:0,7,48:7	0/0:0,15,162:5:5,0:0,19,176:19	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,36,255:12:12,0:0,39,268:39	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1168	.	T	C	11.62	.	DP=248;VDB=0.1;SGB=3.41636;RPB=0.62619;MQB=0;MQSB=0.912094;BQB=0.561905;MQ0F=0;ICB=0.00177225;HOB=0.000868056;AC=1;AN=48;DP4=102,108,1,1;MQ=49	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,24,236:8:8,0:0,34,263:34	0/0:0,42,255:14:14,0:0,52,282:52	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,36,255:12:12,0:0,46,282:46	0/0:0,30,255:10:10,0:0,40,282:40	0/1:58,6,0:2:0,2:41,0,10:10	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,110:3:3,0:0,19,137:19	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,6,73:2:2,0:0,16,100:16	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,40,282:40	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,146:4:4,0:0,22,173:22	0/0:0,9,94:3:3,0:0,19,121:19	0/0:0,15,173:5:5,0:0,25,200:25	0/0:0,24,255:8:8,0:0,34,282:34	0/0:0,15,192:5:5,0:0,25,219:25	0/0:0,27,253:9:9,0:0,37,280:37	0/0:0,9,110:3:3,0:0,19,137:19	0/0:0,138,255:46:46,0:0,148,282:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,18,224:6:6,0:0,28,251:28	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,111:3:3,0:0,19,138:19	0/0:0,9,102:3:3,0:0,19,129:19	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,75,255:25:25,0:0,85,282:85	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,48,255:16:16,0:0,58,282:58	0/0:0,6,77:2:2,0:0,16,104:16	0/0:0,6,75:2:2,0:0,16,102:16	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,33,255:11:11,0:0,43,282:43	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1390	.	G	A	215	.	DP=248;VDB=9.00613e-08;SGB=-23.057;RPB=8.40628e-07;MQB=1.01764e-09;MQSB=0.423916;BQB=0.263757;MQ0F=0;ICB=0.653627;HOB=0.0730969;AC=13;AN=68;DP4=176,32,8,7;MQ=48	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,142:5:5,0:0,15,149:15	0/1:17,0,89:4:3,1:16,0,95:16	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,33,255:11:11,0:0,33,262:33	0/0:0,33,238:11:11,0:0,33,245:33	0/0:0,3,34:1:1,0:1,5,42:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,30,262:30	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:29,0,29:2:1,1:28,0,35:2./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,6,71:2:2,0:0,7,79:7	./.:0,0,0:0:0,0:0,0,0:0	0/1:23,3,0:1:0,1:20,1,5:5	0/1:23,0,35:2:1,1:22,0,41:22	0/1:34,3,0:1:0,1:31,1,5:5	0/0:0,18,170:6:6,0:0,18,177:18	0/0:0,18,188:6:6,0:0,18,195:18	0/0:0,6,70:2:2,0:0,7,78:7	0/0:0,48,255:16:16,0:0,48,262:48	0/0:0,36,209:12:12,0:0,36,216:36	0/0:0,9,110:3:3,0:0,10,117:10	0/0:0,12,124:4:4,0:0,12,131:12	0/0:0,132,255:44:44,0:0,132,262:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,18,163:6:6,0:0,18,170:18	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,130:4:4,0:0,12,137:12	0/1:15,0,142:7:5,2:14,0,148:14	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,63,255:21:21,0:0,63,262:63	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,39,255:13:13,0:0,39,262:39	0/0:0,9,123:3:3,0:0,10,130:10	0/0:0,21,209:7:7,0:0,21,216:21	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:29,3,0:1:0,1:26,1,5:5	0/1:17,3,0:1:0,1:15,1,5:4	0/1:29,3,0:1:0,1:26,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:58,6,0:2:0,2:54,2,3:3	0/0:0,33,255:11:11,0:0,33,262:33	0/1:29,3,0:1:0,1:26,1,5:5	0/1:29,3,0:1:0,1:26,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:29,3,0:1:0,1:26,1,5:5	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017482-RA	1398	.	A	G	225	.	DP=248;VDB=1.08313e-07;SGB=-22.0314;RPB=2.27216e-05;MQB=2.76382e-10;MQSB=0.546358;BQB=0.147491;MQ0F=0;ICB=0.653627;HOB=0.0730969;AC=13;AN=68;DP4=166,43,8,8;MQ=48	GT:PL:DP:AD:GP:GQ	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,15,140:5:5,0:0,15,147:15	0/1:11,0,151:6:5,1:10,0,158:10	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,30,255:10:10,0:0,30,262:30	0/0:0,36,239:12:12,0:0,36,246:36	0/0:0,3,36:1:1,0:1,5,44:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,27,250:9:9,0:0,27,257:27	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:28,0,30:2:1,1:27,0,36:26	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,6,71:2:2,0:0,7,79:7	./.:0,0,0:0:0,0:0,0,0:0	0/1:23,3,0:1:0,1:20,1,5:5	0/1:23,0,35:2:1,1:22,0,41:22	0/1:36,3,0:1:0,1:33,1,5:5	0/0:0,18,172:6:6,0:0,18,179:18	0/0:0,18,187:6:6,0:0,18,194:18	0/0:0,9,108:3:3,0:0,10,115:10	0/0:0,48,255:16:16,0:0,48,262:48	0/0:0,36,206:12:12,0:0,36,213:36	0/0:0,9,110:3:3,0:0,10,117:10	0/0:0,12,121:4:4,0:0,12,128:12	0/0:0,135,255:45:45,0:0,135,262:127	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,18,182:6:6,0:0,18,189:18	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,12,139:4:4,0:0,12,146:12	0/1:15,0,151:7:5,2:14,0,157:14	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,60,255:20:20,0:0,60,262:60	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,42,255:14:14,0:0,42,262:42	0/0:0,9,124:3:3,0:0,10,131:10	0/0:0,21,214:7:7,0:0,21,221:21	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:29,3,0:1:0,1:26,1,5:5	0/1:17,3,0:1:0,1:14,1,5:4	0/1:29,3,0:1:0,1:26,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:58,6,0:2:0,2:53,2,3:3	0/0:0,27,255:9:9,0:0,27,262:27	0/1:29,3,0:1:0,1:26,1,5:5	0/1:29,3,0:1:0,1:26,1,5:5	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:46,6,0:2:0,2:41,2,3:3	./.:0,0,0:0:0,0:0,0,0:0
+OTAU017483-RA	768	.	A	G	246	.	DP=226;VDB=0.962691;SGB=22.1453;RPB=0.577251;MQB=1;MQSB=1;BQB=0.0196293;MQ0F=0.845133;ICB=0.298732;HOB=0.0897741;AC=98;AN=116;DP4=24,28,76,63;MQ=0	GT:PL:DP:AD:GP:GQ	1/1:8,6,0:2:0,2:15,7,0:6	0/1:0,3,4:1:1,0:7,3,4:2	1/1:8,6,0:2:0,2:15,7,0:6	1/1:0,1,0:2:1,1:9,4,2:3	1/1:4,3,0:1:0,1:12,5,1:4	0/1:0,3,4:1:1,0:7,3,4:2	./.:0,0,0:0:0,0:0,0,0:0	1/1:14,12,0:4:0,4:21,12,0:12	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	1/1:4,3,0:1:0,1:12,5,1:4	1/1:0,1,0:2:1,1:9,4,2:3	1/1:7,6,0:2:0,2:14,7,1:6	0/1:0,3,4:1:1,0:7,3,4:2	./.:0,0,0:0:0,0:0,0,0:0	1/1:4,3,0:1:0,1:12,5,1:4	1/1:8,6,0:2:0,2:15,7,0:6	1/1:7,6,0:2:0,2:14,7,1:6	0/0:0,9,11:3:3,0:2,5,6:3	1/1:4,3,0:1:0,1:12,5,1:4	./.:0,0,0:0:0,0:0,0,0:0	0/1:0,3,4:1:1,0:7,3,4:2	1/1:11,9,0:3:0,3:18,9,0:9	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	1/1:0,3,3:3:2,1:7,4,3:2	1/1:7,6,0:2:0,2:14,7,1:6	1/1:4,3,0:1:0,1:12,5,1:4	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	0/1:0,3,4:1:1,0:7,3,4:2	0/1:0,3,4:1:1,0:7,3,4:2	./.:0,0,0:0:0,0:0,0,0:0	0/0:0,9,11:3:3,0:2,5,6:3	1/1:8,6,0:2:0,2:15,7,0:6	1/1:4,3,0:1:0,1:12,5,1:4	1/1:0,4,1:7:4,3:8,5,2:3	1/1:16,15,0:5:0,5:23,15,0:14	1/1:12,18,0:6:0,6:19,18,0:15	1/1:4,3,0:1:0,1:12,5,1:4	1/1:14,12,0:4:0,4:21,12,0:12	1/1:23,30,0:10:0,10:29,30,0:27	1/1:4,3,0:1:0,1:12,5,1:4	1/1:1,3,0:7:3,4:10,5,2:4	1/1:0,1,0:2:1,1:9,4,2:3	1/1:7,6,0:2:0,2:14,7,1:6	1/1:12,15,0:5:0,5:19,15,0:14	1/1:17,15,0:5:0,5:24,15,0:15	0/1:0,3,4:1:1,0:7,3,4:2	1/1:11,9,0:3:0,3:18,9,0:9	./.:0,0,0:0:0,0:0,0,0:0	1/1:4,3,0:1:0,1:12,5,1:4	0/1:0,3,4:1:1,0:7,3,4:2	0/1:0,6,7:2:2,0:4,4,4:1	0/1:0,3,4:1:1,0:7,3,4:2	./.:0,0,0:0:0,0:0,0,0:0	./.:0,0,0:0:0,0:0,0,0:0	1/1:4,3,0:1:0,1:12,5,1:4	1/1:4,3,0:1:0,1:12,5,1:4	./.:0,0,0:0:0,0:0,0,0:0	1/1:14,15,0:5:0,5:21,15,0:14	1/1:14,12,0:4:0,4:21,12,0:12	0/0:0,7,8:7:5,2:4,4,5:2	1/1:8,6,0:2:0,2:15,7,0:6	1/1:0,3,3:5:3,2:7,4,3:2	1/1:17,15,0:5:0,5:24,15,0:15	1/1:5,5,0:6:2,4:13,6,1:5	1/1:0,3,0:12:6,6:9,5,2:4	1/1:23,27,0:9:0,9:29,27,0:25	1/1:20,24,0:8:0,8:26,24,0:22	1/1:20,18,0:6:0,6:26,18,0:17	0/0:0,9,8:10:7,3:3,6,4:2
+[lerogers@pbio381 snps]$ vi OTAU_2018_reads2snps.vcf
+[lerogers@pbio381 snps]$ pwd
+/data/project_data/beetles/snps
+[lerogers@pbio381 snps]$ cd ~
+[lerogers@pbio381 ~]$ mkdir myresults
+[lerogers@pbio381 ~]$ ll
+total 8
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 10:55 cleanreads
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 11:10 fastqcoutput
+drwxr-xr-x. 3 lerogers users   78 Feb 26 10:45 mydata
+drwxr-xr-x. 2 lerogers users    6 Feb 28 11:19 myresults
+drwxr-xr-x. 2 lerogers users   82 Feb  7 10:30 myscripts
+[lerogers@pbio381 ~]$ cd myresults
+[lerogers@pbio381 myresults]$ vcftools
+
+VCFtools (0.1.14)
+© Adam Auton and Anthony Marcketta 2009
+
+Process Variant Call Format files
+
+For a list of options, please go to:
+	https://vcftools.github.io/man_latest.html
+
+Alternatively, a man page is available, type:
+	man vcftools
+
+Questions, comments, and suggestions should be emailed to:
+	vcftools-help@lists.sourceforge.net
+
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps
+
+Error: Does not appear to be a regular file: /data/project_data/beetles/snps
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf 
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+
+After filtering, kept 72 out of 72 Individuals
+After filtering, kept 611928 out of a possible 611928 Sites
+Run Time = 3.00 seconds
+[lerogers@pbio381 myresults]$ ll
+total 4
+-rw-r--r--. 1 lerogers users 283 Feb 28 11:21 out.log
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf --min-alleles 2 --max-alleles 2
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+	--max-alleles 2
+	--min-alleles 2
+
+After filtering, kept 72 out of 72 Individuals
+After filtering, kept 603231 out of a possible 611928 Sites
+Run Time = 4.00 seconds
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf --min-alleles 2 --max-alleles 2 --minGQ 10
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 10
+
+After filtering, kept 72 out of 72 Individuals
+After filtering, kept 603231 out of a possible 611928 Sites
+Run Time = 15.00 seconds
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf --min-alleles 2 --max-alleles 2 --minGQ 10 --max-missing 0.8
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 10
+	--max-missing 0.8
+
+After filtering, kept 72 out of 72 Individuals
+After filtering, kept 113284 out of a possible 611928 Sites
+Run Time = 21.00 seconds
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf --min-alleles 2 --max-alleles 2 --minGQ 10 --max-missing 0.8 --maf 0.01
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 10
+	--max-missing 0.8
+
+After filtering, kept 72 out of 72 Individuals
+After filtering, kept 83120 out of a possible 611928 Sites
+Run Time = 20.00 seconds
+[lerogers@pbio381 myresults]$ vcftools --vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf --min-alleles 2 --max-alleles 2 --minGQ 10 --max-missing 0.8 --maf 0.01 --recode --out OTAU_2018_samtoolsFILTERED.vcf
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /data/project_data/beetles/snps/OTAU_2018_samtools.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 10
+	--max-missing 0.8
+	--out OTAU_2018_samtoolsFILTERED.vcf
+	--recode
+
+After filtering, kept 72 out of 72 Individuals
+Outputting VCF file...
+After filtering, kept 83120 out of a possible 611928 Sites
+Run Time = 38.00 seconds
+[lerogers@pbio381 myresults]$ 
+
+
+
 ------
 <div id='id-section12'/>
 ### Page 12:
