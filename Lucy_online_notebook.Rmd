@@ -1257,10 +1257,756 @@ Run Time = 38.00 seconds
 ### Page 12:
 ------
 <div id='id-section13'/>
-### Page 13:
+### Page 13: 3-5-2018
+
+From terminal, enter r using R command. Leave R using quit()
+
+Save files to our myresults section of home directory, first one was for class comparison (see my paper notebook), second one was for what we decided to do together as a class, with --min-alleles 2, --max-alleles 2, --maf 0.01, --max-missing 0.8, and using reads2snps
+
+Now we have a vcf file we are happy with, we can start doing population genomics with it: SFS (site frequency spectra - frequency distribution of snp alleles in population, tells pop history of rare vs common polymorphism)
+
+cat = print to screen
+
+cut -f cuts all but the "field" you tell it, ie the first column
+
+Here is the terminal code:
+
+Last login: Fri Mar  2 12:05:13 on ttys000
+ip0af52de4:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Fri Mar  2 12:05:43 2018 from ip0af5239f.int.uvm.edu
+[lerogers@pbio381 ~]$ cd /data/project_data/beetles/snps/
+[lerogers@pbio381 snps]$ ll
+total 11962612
+drwxr-xr-x. 2 srkeller users          89 Mar  5 10:40 archive
+-rw-r--r--. 1 srkeller users 10924248151 Mar  4 13:13 OTAU_2018_reads2snps_DP10GP95.vcf
+-rw-r--r--. 1 srkeller users  1325465210 Feb 27 16:51 OTAU_2018_samtools.vcf
+[lerogers@pbio381 snps]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --min-alleles 2 --max-alleles 2 --maf 0.01 --min-GQ 20 --max-missing 1.0 --het --out ~/myresults/reads2snpsmiss1.0
+
+
+Error: Unknown option: --min-GQ
+
+[lerogers@pbio381 snps]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --min-alleles 2 --max-alleles 2 --maf 0.01 --minGQ 20 --max-missing 1.0 --het --out ~/myresults/reads2snpsmiss1.0
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 20
+	--max-missing 1
+	--het
+	--out /users/l/e/lerogers/myresults/reads2snpsmiss1.0
+
+After filtering, kept 72 out of 72 Individuals
+Outputting Individual Heterozygosity
+After filtering, kept 32723 out of a possible 33366006 Sites
+Run Time = 96.00 seconds
+[lerogers@pbio381 snps]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --min-alleles 2 --max-alleles 2 --maf 0.01 --minGQ 10 --max-missing 1.0 --het --out ~/myresults/reads2snpsmiss1.0minGQ10
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--minGQ 10
+	--max-missing 1
+	--het
+	--out /users/l/e/lerogers/myresults/reads2snpsmiss1.0minGQ10
+
+After filtering, kept 72 out of 72 Individuals
+Outputting Individual Heterozygosity
+After filtering, kept 32723 out of a possible 33366006 Sites
+Run Time = 90.00 seconds
+[lerogers@pbio381 snps]$ cd ~
+[lerogers@pbio381 ~]$ cd mydata/
+[lerogers@pbio381 mydata]$ ll
+total 12
+-rw-r--r--. 1 lerogers users  720 Jan 24 11:30 cols_data_Fonly.txt
+-rwxr-xr-x. 1 lerogers users 1474 Jan 24 11:25 cols_data.txt
+drwxr-xr-x. 2 lerogers users 4096 Mar  2 13:04 sam
+[lerogers@pbio381 mydata]$ cd ~
+[lerogers@pbio381 ~]$ cd myresults/
+[lerogers@pbio381 myresults]$ ll
+total 173492
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+[lerogers@pbio381 myresults]$ 
+[lerogers@pbio381 myresults]$ df <- read.table("reads2snpsmiss1.0.het",header=T)
+-bash: syntax error near unexpected token `('
+[lerogers@pbio381 myresults]$ R
+
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> df <- read.table("reads2snpsmiss1.0.het",header=T)
+> str(df)
+'data.frame':	72 obs. of  5 variables:
+ $ INDV   : Factor w/ 72 levels "IT_AD4_F1_","IT_AD4_F2_",..: 1 2 3 4 5 6 8 9 10 7 ...
+ $ O.HOM. : int  25655 24939 25353 26213 24522 26079 25586 25269 24923 25712 ...
+ $ E.HOM. : num  25524 25524 25524 25524 25524 ...
+ $ N_SITES: int  32723 32723 32723 32723 32723 32723 32723 32723 32723 32723 ...
+ $ F      : num  0.0182 -0.0813 -0.0238 0.0957 -0.1392 ...
+> summary(df$F)
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-0.13919  0.01649  0.06757  0.05447  0.10022  0.19002 
+> sd(df$F)
+[1] 0.06923361
+> quit()
+Save workspace image? [y/n/c]: n
+[lerogers@pbio381 myresults]$ cd /data/project_data/beetles/snps/
+[lerogers@pbio381 snps]$ ll
+total 11962612
+drwxr-xr-x. 2 srkeller users          89 Mar  5 10:40 archive
+-rw-r--r--. 1 srkeller users 10924248151 Mar  4 13:13 OTAU_2018_reads2snps_DP10GP95.vcf
+-rw-r--r--. 1 srkeller users  1325465210 Feb 27 16:51 OTAU_2018_samtools.vcf
+[lerogers@pbio381 snps]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf  --min-alleles 2 --max-alleles 2 --maf 0.01 --max-missing 0.8 --recode --out ~/myresults/OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--max-missing 0.8
+	--out /users/l/e/lerogers/myresults/OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf
+	--recode
+
+After filtering, kept 72 out of 72 Individuals
+Outputting VCF file...
+After filtering, kept 133291 out of a possible 33366006 Sites
+Run Time = 94.00 seconds
+[lerogers@pbio381 snps]$ cd ~
+[lerogers@pbio381 ~]$ cd myresults/
+[lerogers@pbio381 myresults]$ ll
+total 214560
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+[lerogers@pbio381 myresults]$ cat /data/project_data/beetles/metadata/cols_data.txt 
+sample_ID	population	devstage	sex
+IT_AD4_F1_	IT	AD4	F
+IT_AD4_F2_	IT	AD4	F
+IT_AD4_F3_	IT	AD4	F
+IT_AD4_M1_	IT	AD4	M
+IT_AD4_M2_	IT	AD4	M
+IT_AD4_M3_	IT	AD4	M
+IT_ADC_F13	IT	ADC	F
+IT_ADC_F14	IT	ADC	F
+IT_ADC_F15	IT	ADC	F
+IT_ADC_F1_	IT	ADC	F
+IT_ADC_F2_	IT	ADC	F
+IT_ADC_F3_	IT	ADC	F
+IT_ADC_F4_	IT	ADC	F
+IT_ADC_F5_	IT	ADC	F
+IT_ADC_F6_	IT	ADC	F
+IT_ADC_M10	IT	ADC	M
+IT_ADC_M11	IT	ADC	M
+IT_ADC_M12	IT	ADC	M
+IT_ADC_M16	IT	ADC	M
+IT_ADC_M17	IT	ADC	M
+IT_ADC_M18	IT	ADC	M
+IT_ADC_M7_	IT	ADC	M
+IT_ADC_M8_	IT	ADC	M
+IT_ADC_M9_	IT	ADC	M
+NC_AD4_F1_	NC	AD4	F
+NC_AD4_F2_	NC	AD4	F
+NC_AD4_F3_	NC	AD4	F
+NC_AD4_M1_	NC	AD4	M
+NC_AD4_M2_	NC	AD4	M
+NC_AD4_M3_	NC	AD4	M
+NC_L3L_F1_	NC	L3L	F
+NC_L3L_F2_	NC	L3L	F
+NC_L3L_F3_	NC	L3L	F
+NC_L3L_M1_	NC	L3L	M
+NC_L3L_M2_	NC	L3L	M
+NC_L3L_M3_	NC	L3L	M
+NC_PD1_F1_	NC	PD1	F
+NC_PD1_F2_	NC	PD1	F
+NC_PD1_F3_	NC	PD1	F
+NC_PD1_M1_	NC	PD1	M
+NC_PD1_M2_	NC	PD1	M
+NC_PD1_M3_	NC	PD1	M
+NC_PP1_F1_	NC	PP1	F
+NC_PP1_F2_	NC	PP1	F
+NC_PP1_F3_	NC	PP1	F
+NC_PP1_M1_	NC	PP1	M
+NC_PP1_M2_	NC	PP1	M
+NC_PP1_M3_	NC	PP1	M
+WA_AD4_F1_	WA	AD4	F
+WA_AD4_F2_	WA	AD4	F
+WA_AD4_F3_	WA	AD4	F
+WA_AD4_M1_	WA	AD4	M
+WA_AD4_M2_	WA	AD4	M
+WA_AD4_M3_	WA	AD4	M
+WA_L3L_F1_	WA	L3L	F
+WA_L3L_F2_	WA	L3L	F
+WA_L3L_F3_	WA	L3L	F
+WA_L3L_M1_	WA	L3L	M
+WA_L3L_M2_	WA	L3L	M
+WA_L3L_M3_	WA	L3L	M
+WA_PD1_F1_	WA	PD1	F
+WA_PD1_F2_	WA	PD1	F
+WA_PD1_F3_	WA	PD1	F
+WA_PD1_M1_	WA	PD1	M
+WA_PD1_M2_	WA	PD1	M
+WA_PD1_M3_	WA	PD1	M
+WA_PP1_F1_	WA	PP1	F
+WA_PP1_F2_	WA	PP1	F
+WA_PP1_F3_	WA	PP1	F
+WA_PP1_M1_	WA	PP1	M
+WA_PP1_M2_	WA	PP1	M
+WA_PP1_M3_	WA	PP1	M
+[lerogers@pbio381 myresults]$ grep "IT" /data/project_data/beetles/metadata/cols_data.txt 
+IT_AD4_F1_	IT	AD4	F
+IT_AD4_F2_	IT	AD4	F
+IT_AD4_F3_	IT	AD4	F
+IT_AD4_M1_	IT	AD4	M
+IT_AD4_M2_	IT	AD4	M
+IT_AD4_M3_	IT	AD4	M
+IT_ADC_F13	IT	ADC	F
+IT_ADC_F14	IT	ADC	F
+IT_ADC_F15	IT	ADC	F
+IT_ADC_F1_	IT	ADC	F
+IT_ADC_F2_	IT	ADC	F
+IT_ADC_F3_	IT	ADC	F
+IT_ADC_F4_	IT	ADC	F
+IT_ADC_F5_	IT	ADC	F
+IT_ADC_F6_	IT	ADC	F
+IT_ADC_M10	IT	ADC	M
+IT_ADC_M11	IT	ADC	M
+IT_ADC_M12	IT	ADC	M
+IT_ADC_M16	IT	ADC	M
+IT_ADC_M17	IT	ADC	M
+IT_ADC_M18	IT	ADC	M
+IT_ADC_M7_	IT	ADC	M
+IT_ADC_M8_	IT	ADC	M
+IT_ADC_M9_	IT	ADC	M
+[lerogers@pbio381 myresults]$ grep "IT" /data/project_data/beetles/metadata/cols_data.txt | cut -f 1
+IT_AD4_F1_
+IT_AD4_F2_
+IT_AD4_F3_
+IT_AD4_M1_
+IT_AD4_M2_
+IT_AD4_M3_
+IT_ADC_F13
+IT_ADC_F14
+IT_ADC_F15
+IT_ADC_F1_
+IT_ADC_F2_
+IT_ADC_F3_
+IT_ADC_F4_
+IT_ADC_F5_
+IT_ADC_F6_
+IT_ADC_M10
+IT_ADC_M11
+IT_ADC_M12
+IT_ADC_M16
+IT_ADC_M17
+IT_ADC_M18
+IT_ADC_M7_
+IT_ADC_M8_
+IT_ADC_M9_
+[lerogers@pbio381 myresults]$ grep "IT" /data/project_data/beetles/metadata/cols_data.txt | cut -f 1 >IT.inds
+[lerogers@pbio381 myresults]$ ll
+total 214564
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --keep IT.inds --freq2 --out IT
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--keep IT.inds
+	--freq2
+	--out IT
+
+Keeping individuals in 'keep' list
+After filtering, kept 24 out of 72 Individuals
+Outputting Frequency Statistics...
+After filtering, kept 133291 out of a possible 133291 Sites
+Run Time = 2.00 seconds
+[lerogers@pbio381 myresults]$ ll
+total 219664
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+[lerogers@pbio381 myresults]$ head IT.frq
+CHROM	POS	N_ALLELES	N_CHR	{FREQ}
+OTAU000033-RA	90	2	40	1	0
+OTAU000033-RA	468	2	44	0.954545	0.0454545
+OTAU000033-RA	510	2	46	0.956522	0.0434783
+OTAU000033-RA	582	2	46	0.869565	0.130435
+OTAU000033-RA	639	2	48	0.75	0.25
+OTAU000033-RA	717	2	46	0.956522	0.0434783
+OTAU000033-RA	726	2	46	1	0
+OTAU000033-RA	738	2	44	1	0
+OTAU000033-RA	753	2	46	1	0
+[lerogers@pbio381 myresults]$ 
+
+
 ------
 <div id='id-section14'/>
-### Page 14:
+### Page 14: 3-7-2018
+
+To do (on board at beginning of class)
+
+1. create individual lists for each population (ex: group "IT" /data/project_data/beetles/metadata/cols.data.txt|cut -f 1)
+2. Run vcftools to get allele frequencies for each population (Ex: vcftools -vcf filename.vcf --keep IT.inds --min....)
+3. dowload .frq output files to your local drive for plotting in R
+
+Last login: Tue Mar  6 13:35:14 on ttys000
+ip0af52b85:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Mon Mar  5 10:39:54 2018 from ip0af52de4.int.uvm.edu
+[lerogers@pbio381 ~]$ grep "NC" /data/project_data/beetles/metadata/cols_data.txt | cut -f 1 > NC.inds
+[lerogers@pbio381 ~]$ grep "WA" /data/project_data/beetles/metadata/cols_data.txt | cut -f 1 > WA.inds
+[lerogers@pbio381 ~]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --keep NC.inds --freq2 --out IT
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--keep NC.inds
+	--freq2
+	--out IT
+
+stat error: No such file or directory
+Error: Can't determine file type of OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+[lerogers@pbio381 ~]$ ll
+total 24
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 10:55 cleanreads
+drwxr-xr-x. 2 lerogers users 4096 Jan 31 11:10 fastqcoutput
+-rw-r--r--. 1 lerogers users  306 Mar  7 10:27 IT.log
+drwxr-xr-x. 3 lerogers users   78 Feb 26 10:45 mydata
+drwxr-xr-x. 2 lerogers users 4096 Mar  5 11:32 myresults
+drwxr-xr-x. 2 lerogers users   82 Feb  7 10:30 myscripts
+-rw-r--r--. 1 lerogers users  264 Mar  7 10:25 NC.inds
+-rw-r--r--. 1 lerogers users  264 Mar  7 10:26 WA.inds
+[lerogers@pbio381 ~]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --keep NC.inds --freq2 --out NC
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--keep NC.inds
+	--freq2
+	--out NC
+
+stat error: No such file or directory
+Error: Can't determine file type of OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+[lerogers@pbio381 ~]$ cd myresults
+[lerogers@pbio381 myresults]$ ll
+total 219664
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+[lerogers@pbio381 myresults]$ cp ~/NC.inds .
+[lerogers@pbio381 myresults]$ cp ~/WA.inds .
+[lerogers@pbio381 myresults]$ ll
+total 219672
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 NC.inds
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 WA.inds
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --keep NC.inds --freq2 --out NC
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--keep NC.inds
+	--freq2
+	--out NC
+
+Keeping individuals in 'keep' list
+After filtering, kept 24 out of 72 Individuals
+Outputting Frequency Statistics...
+After filtering, kept 133291 out of a possible 133291 Sites
+Run Time = 2.00 seconds
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --keep WA.inds --freq2 --out WA
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--keep WA.inds
+	--freq2
+	--out WA
+
+Keeping individuals in 'keep' list
+After filtering, kept 24 out of 72 Individuals
+Outputting Frequency Statistics...
+After filtering, kept 133291 out of a possible 133291 Sites
+Run Time = 2.00 seconds
+[lerogers@pbio381 myresults]$ ll
+total 229484
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users   4959806 Mar  7 10:31 NC.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 NC.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:31 NC.log
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+-rw-r--r--. 1 lerogers users   5077398 Mar  7 10:32 WA.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 WA.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:32 WA.log
+[lerogers@pbio381 myresults]$ 
+
+
+put on local machine: 
+
+Last login: Wed Mar  7 10:20:44 on ttys000
+ip0af52b85:~ Lucy$ cd /Users/Lucy/Desktop/Ecological\ Genomics\ Terminal\ Output\ files 
+ip0af52b85:Ecological Genomics Terminal Output files Lucy$ scp lerogers@pbio381.uvm.edu:~/myresults/*frq .
+lerogers@pbio381.uvm.edu's password: 
+IT.frq                                        100% 5096KB   5.6MB/s   00:00    
+NC.frq                                        100% 4844KB   4.6MB/s   00:01    
+WA.frq                                        100% 4958KB   3.8MB/s   00:01    
+ip0af52b85:Ecological Genomics Terminal Output files Lucy$ 
+
+
+
+Then, in a new R script, we visualized the frequencies of SNP frequencies for each population
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+IT <- read.table("IT.frq",skip=1,header=F)
+NC <- read.table("NC.frq",skip=1,header=F)
+WA <- read.table("WA.frq",skip=1,header=F)
+
+#head(IT)
+#V1 = gene. V2 = location of SNP. V3 = # of alleles (2 by definition). v4 = number of copies (24 individuals = max of 28 copies). V5, V6 = frequency of each allele
+
+IT <- hist(IT$V6, plot=F)
+IT$counts <- IT$counts/sum(IT$counts)
+
+NC <- hist(NC$V6, plot=F)
+NC$counts <- NC$counts/sum(NC$counts)
+
+WA <- hist(WA$V6, plot=F)
+WA$counts <- WA$counts/sum(WA$counts)
+
+plot(IT$counts, type="l", col="red", lwd=1.5,ylim=c(0,0.5))
+lines(NC$counts, col="blue")
+lines(WA$counts, col="green")
+
+
+
+
+
+New workflow: vcf file --> (thin LD) --> cowef vcf .geno --> write bash script to run ADMIXTURE {K=1...10}-->R
+
+
+Thin for LD: 
+
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf  --thin 1000 --recode
+
+
+Then we copied beetle.pop, beetle.spid, and bash script to our myscripts folder and used vim to open the beetle.spid text file and change the three output locations so that it goes to myscripts.
+
+Then we opened the bash script. java -Xmx2G  indicates the # of GB of memory it's working with. If in the future you run out of memory, you can change that number.
+
+We ran into issues running the script so we ended up copying a .geno file over from the public directory.
+
+
+
+Then we opened up a new page with vim and started writing a bash script, called ADMIX.sh, which will run ADMIXTURE for k = 1...10. 
+
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:32 WA.log
+[lerogers@pbio381 myresults]$ vim
+
+#!/bin/bash
+
+for K in {1..10}
+
+do
+
+admixture -j 4 --cv 10 ~/myresults/out.recode.vcf.geno $K | tee log${K}.out
+
+done
+
+grep "CV" log*out >chooseK.txt
+
+
+~  
+
+
+
+Here is the terminal thing: 
+
+
+
+
+Last login: Wed Mar  7 10:32:27 on ttys001
+ip0af52b85:~ Lucy$ ssh lerogers@pbio381.uvm.edu
+lerogers@pbio381.uvm.edu's password: 
+Last login: Wed Mar  7 10:20:59 2018 from ip0af52b85.int.uvm.edu
+[lerogers@pbio381 ~]$ cd myresults
+[lerogers@pbio381 myresults]$ 
+[lerogers@pbio381 myresults]$ ll
+total 229484
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users   4959806 Mar  7 10:31 NC.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 NC.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:31 NC.log
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       360 Feb 28 11:32 out.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+-rw-r--r--. 1 lerogers users   5077398 Mar  7 10:32 WA.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 WA.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:32 WA.log
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf  --thin 1000 --recode
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--thin 1000
+	--recode
+
+After filtering, kept 72 out of 72 Individuals
+Outputting VCF file...
+After filtering, kept 11964 out of a possible 133291 Sites
+Run Time = 0.00 seconds
+[lerogers@pbio381 myresults]$ cd ~/myscripts
+[lerogers@pbio381 myscripts]$ cp /data/project_data/beetles/metadata/beetles.pop  .
+[lerogers@pbio381 myscripts]$ cp /data/scripts/beetle.spid .
+[lerogers@pbio381 myscripts]$ cp /data/scripts/vcf2geno.sh .
+[lerogers@pbio381 myscripts]$ ll
+total 28
+-rwxr-xr-x. 1 lerogers users 1629 Mar  7 11:09 beetle.spid
+-rw-r--r--. 1 lerogers users 1008 Mar  7 11:08 beetles.pop
+-rwxr--r--. 1 lerogers users 6487 Feb  5 11:18 countxpression_PE.py
+-rwxr--r--. 1 lerogers users   33 Feb  7 10:30 test_bash
+-rwxr--r--. 1 lerogers users  764 Jan 31 10:49 trim_F3.sh
+-rwxr-x--x. 1 lerogers users  233 Mar  7 11:09 vcf2geno.sh
+[lerogers@pbio381 myscripts]$ head beetles.pop 
+IT_AD4_F1_	IT
+IT_AD4_F2_	IT
+IT_AD4_F3_	IT
+IT_AD4_M1_	IT
+IT_AD4_M2_	IT
+IT_AD4_M3_	IT
+IT_ADC_F13	IT
+IT_ADC_F14	IT
+IT_ADC_F15	IT
+IT_ADC_F1_	IT
+[lerogers@pbio381 myscripts]$ head beetle.spid
+# spid-file generated: Tue Oct 20 22:21:06 EDT 2015
+
+# VCF Parser questions
+PARSER_FORMAT=VCF
+
+# Only output SNPs with a phred-scaled quality of at least:
+VCF_PARSER_QUAL_QUESTION=
+# Select population definition file:
+VCF_PARSER_POP_FILE_QUESTION=~/mydata/beetle.pop
+# What is the ploidy of the data?
+[lerogers@pbio381 myscripts]$ vim beetle.spid
+[lerogers@pbio381 myscripts]$ vim vcf2geno.sh 
+[lerogers@pbio381 myscripts]$ vash vcf2geno.sh 
+-bash: vash: command not found
+[lerogers@pbio381 myscripts]$ bash vcf2geno.sh 
+INFO  11:17:46 - load PGDSpider configuration from: /data/popgen/PGDSpider_2.0.9.0/spider.conf.xml
+Warning: Could not get charToByteConverterClass!
+initialize convert process...
+read input file...
+
+--------------------------------------------------------------------------------------
+ PGDSpider 2.0.9.0 Copyright (c) 2007 - 2015 by Heidi Lischer, University of Bern
+
+ Citation:
+  Lischer HEL and Excoffier L (2012) PGDSpider: An automated data conversion tool for
+  connecting population genetics and genomics programs. Bioinformatics 28: 298-299.
+--------------------------------------------------------------------------------------
+
+Usage: PGDSpiderCli <options...>
+
+Options:
+-? or -h               For this page.
+-inputfile <file>      The input file for the conversion (mandatory).
+-inputformat <format>  Format of the input file. Mandatory if not defined
+                       in the answer (SPID) file.
+                       Possible input formats:
+                       PGD, ARLEQUIN, BAM, BAPS, BATWING, BCF, CONVERT, FASTA, FASTQ
+                       FSTAT, GDA, GENELAND, GENEPOP, GENETIX, HGDP_CEPH, IMMANC,
+                       IM, MEGA, MIGRATE, MSA, NEWHYBRIDS, NEXUS, PED, PHYLIP,
+                       SAM, STRUCTURE, VCF
+-outputfile <file>     The output file for the conversion (mandatory).
+-outputformat <format> Format of the output file. Mandatory if not defined
+                       in the answer (SPID) file.
+                       Possible output formats:
+                       PGD, ARLEQUIN, BAM, BAPS, BATWING, BCF, FASTA, FASTQ, FDIST2, FSTAT,
+                       GDA, GENELAND, GENEPOP, GENETIX, GESTE_BAYE_SCAN, IMMANC, IM,
+                       KML, MEGA, MIGRATE, MSA, MSVAR, NEWHYBRIDS, NEXUS, PED, PHYLIP,
+                       SAM, STRUCTURE, VCF
+-spid <file>           SPID file containing preanswered conversion questions
+                       (mandatory).
+
+
+java.lang.NullPointerException
+java.lang.NullPointerException
+	at ch.unibe.iee.cmpg.pgdspider.model.parser.VcfParser.parse(VcfParser.java:563)
+	at ch.unibe.iee.cmpg.pgdspider.cli.CLIController.convert(CLIController.java:220)
+	at ch.unibe.iee.cmpg.pgdspider.PGDSpiderCli.main(PGDSpiderCli.java:31)
+[lerogers@pbio381 myscripts]$ vim vcf2geno.sh 
+[lerogers@pbio381 myscripts]$ vim beetle.spid
+[lerogers@pbio381 myscripts]$ vim vcf2geno.sh 
+[lerogers@pbio381 myscripts]$ bash vcf2geno.sh 
+INFO  11:21:04 - load PGDSpider configuration from: /data/popgen/PGDSpider_2.0.9.0/spider.conf.xml
+Warning: Could not get charToByteConverterClass!
+initialize convert process...
+read input file...
+ERROR 11:21:04 - File: ~/myscripts/beetles.pop not found!
+read input file done.
+write output file...
+ERROR 11:21:06 - File: ~/myscripts/beetle not found!
+ERROR 11:21:06 - File: ~/myscripts/beetle not found!
+WARN  11:21:07 - Ind file not writable!
+WARN  11:21:07 - SNP file not writable!
+write output file done.
+[lerogers@pbio381 myscripts]$ chmod u+x beetles.pop 
+[lerogers@pbio381 myscripts]$ bash vcf2geno.sh 
+INFO  11:21:32 - load PGDSpider configuration from: /data/popgen/PGDSpider_2.0.9.0/spider.conf.xml
+Warning: Could not get charToByteConverterClass!
+initialize convert process...
+read input file...
+ERROR 11:21:32 - File: ~/myscripts/beetles.pop not found!
+read input file done.
+write output file...
+ERROR 11:21:35 - File: ~/myscripts/beetle not found!
+ERROR 11:21:35 - File: ~/myscripts/beetle not found!
+WARN  11:21:35 - Ind file not writable!
+WARN  11:21:35 - SNP file not writable!
+write output file done.
+[lerogers@pbio381 myscripts]$ cd ~/myresults/
+[lerogers@pbio381 myresults]$ cp /data/project_data/beetles/snps/*.geno .
+[lerogers@pbio381 myresults]$ ll
+total 233984
+-rw-r--r--. 1 lerogers users   5218166 Mar  5 11:32 IT.frq
+-rw-r--r--. 1 lerogers users       264 Mar  5 11:31 IT.inds
+-rw-r--r--. 1 lerogers users       402 Mar  5 11:32 IT.log
+-rw-r--r--. 1 lerogers users   4959806 Mar  7 10:31 NC.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 NC.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:31 NC.log
+-rw-r--r--. 1 lerogers users       458 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.log
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       431 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.log
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users       342 Mar  7 11:02 out.log
+-rw-r--r--. 1 lerogers users   3730115 Mar  7 11:02 out.recode.vcf
+-rw-r--r--. 1 lerogers users    873372 Mar  7 11:25 out.recode.vcf.geno
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:56 reads2snpsmiss1.0.het
+-rw-r--r--. 1 lerogers users       438 Mar  5 10:56 reads2snpsmiss1.0.log
+-rw-r--r--. 1 lerogers users      2850 Mar  5 10:59 reads2snpsmiss1.0minGQ10.het
+-rw-r--r--. 1 lerogers users       445 Mar  5 10:59 reads2snpsmiss1.0minGQ10.log
+-rw-r--r--. 1 lerogers users   5077398 Mar  7 10:32 WA.frq
+-rw-r--r--. 1 lerogers users       264 Mar  7 10:31 WA.inds
+-rw-r--r--. 1 lerogers users       402 Mar  7 10:32 WA.log
+[lerogers@pbio381 myresults]$ vim
+[lerogers@pbio381 myresults]$ chmod u+x ADMIX.sh 
+[lerogers@pbio381 myresults]$ 
+
+
+
+
+
+
+
 ------
 <div id='id-section15'/>
 ### Page 15:

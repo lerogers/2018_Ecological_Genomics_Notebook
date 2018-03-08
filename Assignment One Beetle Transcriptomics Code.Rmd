@@ -1,0 +1,512 @@
+---
+title: "Assignment-One-Beetle-Transcriptomics-Code"
+author: "Lucy Rogers"
+date: "3/7/2018"
+output: html_document
+---
+
+Code for Both Sexes Population Comparison:
+
+```{r}
+# set working directory
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+library("DESeq2")
+library("ggplot2")
+
+countsTable <- read.delim('allcountsdataRN_noIT.txt',header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+countData <- as.matrix(countsTable)
+head(countData)
+
+conds <- read.delim("cols_data_noIT.txt", header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+head(conds)
+colData <- as.data.frame(conds)
+
+####################################### we've now set everything up
+
+###### Use group model to group by population, devstage, and sex; This part is commented out because we ended up using the output from Steve's dds
+
+#colData$group <- factor(paste0(colData$population, "-", colData$devstage, "-", colData$sex))
+#head(colData)
+
+#dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ group)
+#dds <- dds[rowSums(counts(dds)) > 1, ]
+#dim(dds)
+
+#dds <- DESeq(dds, modelMatrixType = "standard", parallel=T)
+
+
+#resultsNames(dds)
+# [1] "Intercept"                  "group_NC.AD4.M_vs_NC.AD4.F" "group_NC.L3L.F_vs_NC.AD4.F"
+# [4] "group_NC.L3L.M_vs_NC.AD4.F" "group_NC.PD1.F_vs_NC.AD4.F" "group_NC.PD1.M_vs_NC.AD4.F"
+# [7] "group_NC.PP1.F_vs_NC.AD4.F" "group_NC.PP1.M_vs_NC.AD4.F" "group_WA.AD4.F_vs_NC.AD4.F"
+# [10] "group_WA.AD4.M_vs_NC.AD4.F" "group_WA.L3L.F_vs_NC.AD4.F" "group_WA.L3L.M_vs_NC.AD4.F"
+# [13] "group_WA.PD1.F_vs_NC.AD4.F" "group_WA.PD1.M_vs_NC.AD4.F" "group_WA.PP1.F_vs_NC.AD4.F"
+# [16] "group_WA.PP1.M_vs_NC.AD4.F"
+
+#res <- results(dds)
+#str(res)
+
+#res <- res[order(res$padj),]
+#head(res)
+
+#summary(res)
+# 
+# out of 16851 with nonzero total read count
+# adjusted p-value < 0.1
+# LFC > 0 (up)     : 3754, 22% 
+# LFC < 0 (down)   : 3192, 19% 
+# outliers [1]     : 17, 0.1% 
+# low counts [2]   : 1961, 12% 
+# (mean count < 1)
+# [1] see 'cooksCutoff' argument of ?results
+# [2] see 'independentFiltering' argument of ?results
+
+####### load output from Steve's GitHub which replaced our dds output with dds output that had the correct result names.
+load("dds_GroupDesign.RData")
+resultsNames(dds)
+
+# [1] "Intercept"     "groupNC.AD4.F" "groupNC.AD4.M" "groupNC.L3L.F" "groupNC.L3L.M"
+# [6] "groupNC.PD1.F" "groupNC.PD1.M" "groupNC.PP1.F" "groupNC.PP1.M" "groupWA.AD4.F"
+# [11] "groupWA.AD4.M" "groupWA.L3L.F" "groupWA.L3L.M" "groupWA.PD1.F" "groupWA.PD1.M"
+# [16] "groupWA.PP1.F" "groupWA.PP1.M"
+
+
+#Contrast the two populations with each other
+res_pop <- results(dds, contrast = list(c("groupNC.AD4.M", "groupNC.L3L.M", "groupNC.PD1.M", "groupNC.PP1.M", "groupNC.AD4.F", "groupNC.L3L.F", "groupNC.PD1.F", "groupNC.PP1.F"),c("groupWA.AD4.F", "groupWA.L3L.F", "groupWA.PD1.F", "groupWA.PP1.F", "groupWA.AD4.M", "groupWA.L3L.M", "groupWA.PD1.M", "groupWA.PP1.M")), listValues = c(1/2,-1/2), alpha = 0.05)
+
+res_pop <-res_pop[order(res_pop$padj),]
+head(res_pop)
+summary(res_pop)
+
+
+#################### Data Visualization: create MA plot
+plotMA(res_pop, main="DESeq2", ylim=c(-2,2))
+abline(h=c(-1,1), col="blue", lwd=2)
+
+
+################ Save outputs for making GO plot
+
+write.csv(res_pop, file="DGE_NCvsWA_pop_bothsexes.csv", row.names = T, quote=F)
+
+
+# change pvalue to -log(pvalue) and export as .csv with rownames
+
+neglogpval <- as.matrix(-log(res_pop$pvalue))
+head(neglogpval)
+
+res_pop_negpval <- cbind(row.names(res_pop),neglogpval)
+head(res_pop_negpval)
+
+colnames(res_pop_negpval)=c("gene","neglogpval")
+
+write.csv(res_pop_negpval, file="DGE_NCvsWA_pop_bothsexes.csv", row.names=F,quote=F)
+
+############################ Make GO plot
+
+input="DGE_NCvsWA_pop_bothsexes.csv" 
+goAnnotations="gene_annotation_only.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
+goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
+goDivision="BP" # either MF, or BP, or CC
+source("gomwu.functions.R")
+
+
+gomwuStats(input, goDatabase, goAnnotations, goDivision,
+           perlPath="perl", # replace with full path to perl executable if it is not in your system's PATH already
+           largest=0.1,  # a GO category will not be considered if it contains more than this fraction of the total number of genes
+           smallest=5,   # a GO category should contain at least this many genes to be considered
+           clusterCutHeight=0.25, # threshold for merging similar (gene-sharing) terms. 
+           Alternative="g" # by default the MWU test is two-tailed; specify "g" or "l" of you want to test for "greater" or "less" instead
+)
+
+library(ape)
+quartz()
+gomwuPlot(input,goAnnotations,goDivision,
+          absValue=-log(0.05,10),  # genes with the measure value exceeding this will be counted as "good genes". Specify absValue=0.5 if you are doing Fisher's exact test for standard GO enrichment.
+          level1=0.1, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
+          level2=0.05, # FDR cutoff to print in regular (not italic) font.
+          level3=0.01, # FDR cutoff to print in large bold font.
+          txtsize=1.2,    # decrease to fit more on one page, or increase (after rescaling the plot so the tree fits the text) for better "word cloud" effect
+          treeHeight=0.5, # height of the hierarchical clustering tree
+          #	colors=c("dodgerblue2","firebrick1","skyblue","lightcoral") # these are default colors, un-remar and change if needed
+)
+
+
+############# Pull out significant genes to be able to make a heatmap
+
+sig_pop <- res_pop[which(res_pop$padj <0.05), ]  # great way to subset data
+dim(sig_pop) # check
+
+sig_pop_df <- as.data.frame(sig_pop)
+sig_pop_df$Row.names <- rownames(sig_pop_df)
+dim(sig_pop_df) #column dimensions increase by one because we made the rownames a new column
+
+genesOfInterest_pop <- c(sig_pop_df$Row.names)
+length(genesOfInterest_pop)
+
+
+####
+
+dds$combined = factor(paste0(dds$population, "-", dds$devstage, "-", dds$sex))
+dds$combined <- factor(dds$combined, levels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"), labels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"))
+
+baseMeanPerGrp <- sapply( levels(dds$combined), function(lvl) rowMeans( counts(dds,normalized=TRUE)[,dds$combined == lvl] ) )
+
+
+head(baseMeanPerGrp)
+dim(baseMeanPerGrp)
+
+# pulls out normalized counts (avg of 3 reps) for all of our significant genes
+m <- baseMeanPerGrp[genesOfInterest_pop, c("WA-PP1-M", "WA-L3L-M", "WA-PD1-M", "WA-AD4-M", "NC-PP1-M", "NC-L3L-M", "NC-PD1-M", "NC-AD4-M", "WA-PP1-F", "WA-L3L-F", "WA-PD1-F", "WA-AD4-F", "NC-PP1-F", "NC-L3L-F", "NC-PD1-F", "NC-AD4-F")]
+
+head(m)
+dim(m)
+
+mat_scaled = t(apply(m, 1, scale)) #gives them all mean of 0 and SD of 1
+head(mat_scaled)
+
+####################### Make Heat Map
+
+library(pheatmap)
+
+pheatmap(mat_scaled, labels_col = c("WA-PP1-M", "WA-L3L-M", "WA-PD1-M", "WA-AD4-M", "NC-PP1-M", "NC-L3L-M", "NC-PD1-M", "NC-AD4-M", "WA-PP1-F", "WA-L3L-F", "WA-PD1-F", "WA-AD4-F", "NC-PP1-F", "NC-L3L-F", "NC-PD1-F", "NC-AD4-F"), cluster_cols = T, cluster_rows = T)
+
+```
+
+Code for female only population comparison: 
+
+```{r}
+# set working directory
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+library("DESeq2")
+library("ggplot2")
+
+countsTable <- read.delim('allcountsdataRN_noIT.txt',header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+countData <- as.matrix(countsTable)
+head(countData)
+
+conds <- read.delim("cols_data_noIT.txt", header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+head(conds)
+colData <- as.data.frame(conds)
+
+####################################### we've now set everything up
+
+###### Use group model to group by population, devstage, and sex; This part is commented out because we ended up using the output from Steve's dds
+
+#colData$group <- factor(paste0(colData$population, "-", colData$devstage, "-", colData$sex))
+#head(colData)
+
+#dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ group)
+#dds <- dds[rowSums(counts(dds)) > 1, ]
+#dim(dds)
+
+#dds <- DESeq(dds, modelMatrixType = "standard", parallel=T)
+
+
+#resultsNames(dds)
+# [1] "Intercept"                  "group_NC.AD4.M_vs_NC.AD4.F" "group_NC.L3L.F_vs_NC.AD4.F"
+# [4] "group_NC.L3L.M_vs_NC.AD4.F" "group_NC.PD1.F_vs_NC.AD4.F" "group_NC.PD1.M_vs_NC.AD4.F"
+# [7] "group_NC.PP1.F_vs_NC.AD4.F" "group_NC.PP1.M_vs_NC.AD4.F" "group_WA.AD4.F_vs_NC.AD4.F"
+# [10] "group_WA.AD4.M_vs_NC.AD4.F" "group_WA.L3L.F_vs_NC.AD4.F" "group_WA.L3L.M_vs_NC.AD4.F"
+# [13] "group_WA.PD1.F_vs_NC.AD4.F" "group_WA.PD1.M_vs_NC.AD4.F" "group_WA.PP1.F_vs_NC.AD4.F"
+# [16] "group_WA.PP1.M_vs_NC.AD4.F"
+
+#res <- results(dds)
+#str(res)
+
+#res <- res[order(res$padj),]
+#head(res)
+
+#summary(res)
+# 
+# out of 16851 with nonzero total read count
+# adjusted p-value < 0.1
+# LFC > 0 (up)     : 3754, 22% 
+# LFC < 0 (down)   : 3192, 19% 
+# outliers [1]     : 17, 0.1% 
+# low counts [2]   : 1961, 12% 
+# (mean count < 1)
+# [1] see 'cooksCutoff' argument of ?results
+# [2] see 'independentFiltering' argument of ?results
+
+####### load output from Steve's GitHub which replaced our dds output with dds output that had the correct result names.
+load("dds_GroupDesign.RData")
+resultsNames(dds)
+
+# [1] "Intercept"     "groupNC.AD4.F" "groupNC.AD4.M" "groupNC.L3L.F" "groupNC.L3L.M"
+# [6] "groupNC.PD1.F" "groupNC.PD1.M" "groupNC.PP1.F" "groupNC.PP1.M" "groupWA.AD4.F"
+# [11] "groupWA.AD4.M" "groupWA.L3L.F" "groupWA.L3L.M" "groupWA.PD1.F" "groupWA.PD1.M"
+# [16] "groupWA.PP1.F" "groupWA.PP1.M"
+
+
+#Contrast females of each population with each other
+res_pop_F <- results(dds, contrast = list(c("groupNC.AD4.F", "groupNC.L3L.F", "groupNC.PD1.F", "groupNC.PP1.F"),c("groupWA.AD4.F", "groupWA.L3L.F", "groupWA.PD1.F", "groupWA.PP1.F")), listValues = c(1/2,-1/2), alpha = 0.05)
+
+res_pop_F <-res_pop_F[order(res_pop_F$padj),]
+head(res_pop_F)
+summary(res_pop_F)
+
+#################### Data Visualization: create MA plot
+plotMA(res_pop_F, main="DESeq2", ylim=c(-2,2))
+abline(h=c(-1,1), col="blue", lwd=2)
+
+
+################ Save outputs for making GO plot
+
+write.csv(res_pop_F, file="DGE_NCvsWA_pop_femalesonly.csv", row.names = T, quote=F)
+
+
+# change pvalue to -log(pvalue) and export as .csv with rownames
+
+neglogpval <- as.matrix(-log(res_pop_F$pvalue))
+head(neglogpval)
+
+res_pop_F_negpval <- cbind(row.names(res_pop_F),neglogpval)
+head(res_pop_F_negpval)
+
+colnames(res_pop_F_negpval)=c("gene","neglogpval")
+
+write.csv(res_pop_F_negpval, file="DGE_NCvsWA_pop_femalesonly.csv", row.names=F,quote=F)
+
+############################ Make GO plot
+
+input="DGE_NCvsWA_pop_femalesonly.csv" 
+goAnnotations="gene_annotation_only.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
+goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
+goDivision="BP" # either MF, or BP, or CC
+source("gomwu.functions.R")
+
+
+gomwuStats(input, goDatabase, goAnnotations, goDivision,
+           perlPath="perl", # replace with full path to perl executable if it is not in your system's PATH already
+           largest=0.1,  # a GO category will not be considered if it contains more than this fraction of the total number of genes
+           smallest=5,   # a GO category should contain at least this many genes to be considered
+           clusterCutHeight=0.25, # threshold for merging similar (gene-sharing) terms. 
+           Alternative="g" # by default the MWU test is two-tailed; specify "g" or "l" of you want to test for "greater" or "less" instead
+)
+
+library(ape)
+quartz()
+gomwuPlot(input,goAnnotations,goDivision,
+          absValue=-log(0.05,10),  # genes with the measure value exceeding this will be counted as "good genes". Specify absValue=0.5 if you are doing Fisher's exact test for standard GO enrichment.
+          level1=0.1, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
+          level2=0.05, # FDR cutoff to print in regular (not italic) font.
+          level3=0.01, # FDR cutoff to print in large bold font.
+          txtsize=1.2,    # decrease to fit more on one page, or increase (after rescaling the plot so the tree fits the text) for better "word cloud" effect
+          treeHeight=0.5, # height of the hierarchical clustering tree
+          #	colors=c("dodgerblue2","firebrick1","skyblue","lightcoral") # these are default colors, un-remar and change if needed
+)
+
+
+############# Pull out significant genes to be able to make a heatmap
+
+sig_pop_F <- res_pop_F[which(res_pop_F$padj <0.05), ]  # great way to subset data
+dim(sig_pop_F) # check
+
+sig_pop_F_df <- as.data.frame(sig_pop_F)
+sig_pop_F_df$Row.names <- rownames(sig_pop_F_df)
+dim(sig_pop_F_df) #column dimensions increase by one because we made the rownames a new column
+
+genesOfInterest_pop_F <- c(sig_pop_F_df$Row.names)
+length(genesOfInterest_pop_F)
+
+
+####
+
+dds$combined = factor(paste0(dds$population, "-", dds$devstage, "-", dds$sex))
+dds$combined <- factor(dds$combined, levels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"), labels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"))
+
+baseMeanPerGrp <- sapply( levels(dds$combined), function(lvl) rowMeans( counts(dds,normalized=TRUE)[,dds$combined == lvl] ) )
+
+
+head(baseMeanPerGrp)
+dim(baseMeanPerGrp)
+
+# pulls out normalized counts (avg of 3 reps) for all of our significant genes
+m <- baseMeanPerGrp[genesOfInterest_pop_F, c("WA-PP1-F", "WA-L3L-F", "WA-PD1-F", "WA-AD4-F", "NC-PP1-F", "NC-L3L-F", "NC-PD1-F", "NC-AD4-F")]
+
+head(m)
+dim(m)
+
+mat_scaled = t(apply(m, 1, scale)) #gives them all mean of 0 and SD of 1
+head(mat_scaled)
+
+####################### Make Heat Map
+
+library(pheatmap)
+
+pheatmap(mat_scaled, labels_col = c("WA-PP1-F", "WA-L3L-F", "WA-PD1-F", "WA-AD4-F", "NC-PP1-F", "NC-L3L-F", "NC-PD1-F", "NC-AD4-F"), cluster_cols = T, cluster_rows = T)
+
+
+```
+
+
+Code for male only population comparison:
+
+```{r}
+# set working directory
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+library("DESeq2")
+library("ggplot2")
+
+countsTable <- read.delim('allcountsdataRN_noIT.txt',header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+countData <- as.matrix(countsTable)
+head(countData)
+
+conds <- read.delim("cols_data_noIT.txt", header=TRUE, stringsAsFactors = TRUE, row.names = 1)
+head(conds)
+colData <- as.data.frame(conds)
+
+####################################### we've now set everything up
+
+###### Use group model to group by population, devstage, and sex; This part is commented out because we ended up using the output from Steve's dds
+
+#colData$group <- factor(paste0(colData$population, "-", colData$devstage, "-", colData$sex))
+#head(colData)
+
+#dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ group)
+#dds <- dds[rowSums(counts(dds)) > 1, ]
+#dim(dds)
+
+#dds <- DESeq(dds, modelMatrixType = "standard", parallel=T)
+
+
+#resultsNames(dds)
+# [1] "Intercept"                  "group_NC.AD4.M_vs_NC.AD4.F" "group_NC.L3L.F_vs_NC.AD4.F"
+# [4] "group_NC.L3L.M_vs_NC.AD4.F" "group_NC.PD1.F_vs_NC.AD4.F" "group_NC.PD1.M_vs_NC.AD4.F"
+# [7] "group_NC.PP1.F_vs_NC.AD4.F" "group_NC.PP1.M_vs_NC.AD4.F" "group_WA.AD4.F_vs_NC.AD4.F"
+# [10] "group_WA.AD4.M_vs_NC.AD4.F" "group_WA.L3L.F_vs_NC.AD4.F" "group_WA.L3L.M_vs_NC.AD4.F"
+# [13] "group_WA.PD1.F_vs_NC.AD4.F" "group_WA.PD1.M_vs_NC.AD4.F" "group_WA.PP1.F_vs_NC.AD4.F"
+# [16] "group_WA.PP1.M_vs_NC.AD4.F"
+
+#res <- results(dds)
+#str(res)
+
+#res <- res[order(res$padj),]
+#head(res)
+
+#summary(res)
+# 
+# out of 16851 with nonzero total read count
+# adjusted p-value < 0.1
+# LFC > 0 (up)     : 3754, 22% 
+# LFC < 0 (down)   : 3192, 19% 
+# outliers [1]     : 17, 0.1% 
+# low counts [2]   : 1961, 12% 
+# (mean count < 1)
+# [1] see 'cooksCutoff' argument of ?results
+# [2] see 'independentFiltering' argument of ?results
+
+####### load output from Steve's GitHub which replaced our dds output with dds output that had the correct result names.
+load("dds_GroupDesign.RData")
+resultsNames(dds)
+ 
+# [1] "Intercept"     "groupNC.AD4.F" "groupNC.AD4.M" "groupNC.L3L.F" "groupNC.L3L.M"
+# [6] "groupNC.PD1.F" "groupNC.PD1.M" "groupNC.PP1.F" "groupNC.PP1.M" "groupWA.AD4.F"
+# [11] "groupWA.AD4.M" "groupWA.L3L.F" "groupWA.L3L.M" "groupWA.PD1.F" "groupWA.PD1.M"
+# [16] "groupWA.PP1.F" "groupWA.PP1.M"
+
+
+#Contrast males of each population with each other
+res_pop_M <- results(dds, contrast = list(c("groupNC.AD4.M", "groupNC.L3L.M", "groupNC.PD1.M", "groupNC.PP1.M"),c("groupWA.AD4.M", "groupWA.L3L.M", "groupWA.PD1.M", "groupWA.PP1.M")), listValues = c(1/2,-1/2), alpha = 0.05)
+
+res_pop_M <-res_pop_M[order(res_pop_M$padj),]
+head(res_pop_M)
+summary(res_pop_M)
+
+#################### Data Visualization: create MA plot
+plotMA(res_pop_M, main="DESeq2", ylim=c(-2,2))
+abline(h=c(-1,1), col="blue", lwd=2)
+
+
+################ Save outputs for making GO plot
+
+write.csv(res_pop_M, file="DGE_NCvsWA_pop_malesonly.csv", row.names = T, quote=F)
+
+
+# change pvalue to -log(pvalue) and export as .csv with rownames
+
+neglogpval <- as.matrix(-log(res_pop_M$pvalue))
+head(neglogpval)
+
+res_pop_M_negpval <- cbind(row.names(res_pop_M),neglogpval)
+head(res_pop_M_negpval)
+
+colnames(res_pop_M_negpval)=c("gene","neglogpval")
+
+write.csv(res_pop_M_negpval, file="DGE_NCvsWA_pop_malesonly.csv", row.names=F,quote=F)
+
+############################ Make GO plot
+
+input="DGE_NCvsWA_pop_malesonly.csv" 
+goAnnotations="gene_annotation_only.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
+goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
+goDivision="BP" # either MF, or BP, or CC
+source("gomwu.functions.R")
+
+
+gomwuStats(input, goDatabase, goAnnotations, goDivision,
+           perlPath="perl", # replace with full path to perl executable if it is not in your system's PATH already
+           largest=0.1,  # a GO category will not be considered if it contains more than this fraction of the total number of genes
+           smallest=5,   # a GO category should contain at least this many genes to be considered
+           clusterCutHeight=0.25, # threshold for merging similar (gene-sharing) terms. 
+           Alternative="g" # by default the MWU test is two-tailed; specify "g" or "l" of you want to test for "greater" or "less" instead
+)
+
+library(ape)
+quartz()
+gomwuPlot(input,goAnnotations,goDivision,
+          absValue=-log(0.05,10),  # genes with the measure value exceeding this will be counted as "good genes". Specify absValue=0.5 if you are doing Fisher's exact test for standard GO enrichment.
+          level1=0.1, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
+          level2=0.05, # FDR cutoff to print in regular (not italic) font.
+          level3=0.01, # FDR cutoff to print in large bold font.
+          txtsize=1.2,    # decrease to fit more on one page, or increase (after rescaling the plot so the tree fits the text) for better "word cloud" effect
+          treeHeight=0.5, # height of the hierarchical clustering tree
+          #	colors=c("dodgerblue2","firebrick1","skyblue","lightcoral") # these are default colors, un-remar and change if needed
+)
+
+
+############# Pull out significant genes to be able to make a heatmap
+
+sig_pop_M <- res_pop_M[which(res_pop_M$padj <0.05), ]  # great way to subset data
+dim(sig_pop_M) # check
+
+sig_pop_M_df <- as.data.frame(sig_pop_M)
+sig_pop_M_df$Row.names <- rownames(sig_pop_M_df)
+dim(sig_pop_M_df) #column dimensions increase by one because we made the rownames a new column
+
+genesOfInterest_pop_M <- c(sig_pop_M_df$Row.names)
+length(genesOfInterest_pop_M)
+
+vsd <- vst(dds, blind =FALSE)
+
+####
+
+dds$combined = factor(paste0(dds$population, "-", dds$devstage, "-", dds$sex))
+dds$combined <- factor(dds$combined, levels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"), labels=c("WA-L3L-F","WA-L3L-M","WA-PP1-F","WA-PP1-M","WA-PD1-F","WA-PD1-M","WA-AD4-F","WA-AD4-M","NC-L3L-F","NC-L3L-M","NC-PP1-F","NC-PP1-M","NC-PD1-F","NC-PD1-M","NC-AD4-F","NC-AD4-M"))
+
+baseMeanPerGrp <- sapply( levels(dds$combined), function(lvl) rowMeans( counts(dds,normalized=TRUE)[,dds$combined == lvl] ) )
+
+
+head(baseMeanPerGrp)
+dim(baseMeanPerGrp)
+
+# pulls out normalized counts (avg of 3 reps) for all of our significant genes
+m <- baseMeanPerGrp[genesOfInterest_pop_M, c("WA-PP1-M", "WA-L3L-M", "WA-PD1-M", "WA-AD4-M", "NC-PP1-M", "NC-L3L-M", "NC-PD1-M", "NC-AD4-M")]
+
+head(m)
+dim(m)
+
+mat_scaled = t(apply(m, 1, scale)) #gives them all mean of 0 and SD of 1
+head(mat_scaled)
+
+####################### Make Heat Map
+
+library(pheatmap)
+
+pheatmap(mat_scaled, labels_col = c("WA-PP1-M", "WA-L3L-M", "WA-PD1-M", "WA-AD4-M", "NC-PP1-M", "NC-L3L-M", "NC-PD1-M", "NC-AD4-M"), cluster_cols = T, cluster_rows = T)
+
+```
+
