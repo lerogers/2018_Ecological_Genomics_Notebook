@@ -1,0 +1,109 @@
+---
+title: "Code for HW 2"
+author: "Lucy Rogers"
+date: "3/26/2018"
+output: html_document
+---
+
+Creating Admixture plots for thin = 1000 and thin = 500:
+
+```{r}
+#install.packages(c("Cairo","ggplot2","gridExtra","gtable","tidyr","devtools"),dependencies=T) 
+#devtools::install_github('royfrancis/pophelper')
+
+library(pophelper)
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+admixfiles=list.files(path=("Admixture/"),full.names=T)
+admixlist=readQ(files=admixfiles,filetype="basic")
+
+# metadata: sample id and pop from beetle.pop file
+metadata=read.table("cols_data.txt",header=T)
+
+# format metadata to a data frame and ind variables as chars. for plotting
+metadata2=data.frame(sampleid=metadata[,1], population=metadata[,2])
+
+metadata2$sampleid=as.character(metadata2$sampleid)
+metadata2$population=as.character(metadata2$population)
+
+# add in the sample id to the different Q files for plotting
+if(length(unique(sapply(admixlist,nrow)))==1)
+  admixlist <- lapply(admixlist,"rownames<-",metadata2$sampleid)
+
+#show us the head of the 3rd element in the list, which is K=4
+head(admixlist[[3]])
+
+#Make ancestry plots grouped by population
+p <- plotQ(admixlist[c(1,2,3)],
+           returnplot=T,exportplot=T,quiet=T,basesize=11, imgoutput="join", 
+           showyaxis=T, showticks=T, panelspacer=0.4, useindlab=F, showindlab=F, 
+           grplab=metadata2[2], grplabsize=4, linesize=1, barsize=1, pointsize=3, 
+           panelratio=c(4,1), divsize = 0.75, pointcol="white", showtitle=T, 
+           titlelab="ADMIXTURE analysis on O. tauri, SNPs thinned to 1 per kb", 
+           splab=c("K=2","K=3","K=4"), outputfilename="ADMIXTURE_Otauri",
+           imgtype="pdf",height=3,width=25)
+
+plot(p$plot[[1]])
+
+
+####### The part below creates the ADMIXTURE plot for my thin500 data. It changes the working directory!!
+
+library(pophelper)
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+admixfiles=list.files(path=("Admixture Thin 500/"),full.names=T)
+admixlist=readQ(files=admixfiles,filetype="basic")
+
+# metadata: sample id and pop from beetle.pop file
+metadata=read.table("cols_data.txt",header=T)
+
+# format metadata to a data frame and ind variables as chars. for plotting
+metadata2=data.frame(sampleid=metadata[,1], population=metadata[,2])
+
+metadata2$sampleid=as.character(metadata2$sampleid)
+metadata2$population=as.character(metadata2$population)
+
+# add in the sample id to the different Q files for plotting
+if(length(unique(sapply(admixlist,nrow)))==1)
+  admixlist <- lapply(admixlist,"rownames<-",metadata2$sampleid)
+
+#show us the head of the 3rd element in the list, which is K=4
+head(admixlist[[3]])
+
+#Make ancestry plots grouped by population
+p <- plotQ(admixlist[c(1,2,3)],
+           returnplot=T,exportplot=T,quiet=T,basesize=11, imgoutput="join", 
+           showyaxis=T, showticks=T, panelspacer=0.4, useindlab=F, showindlab=F, 
+           grplab=metadata2[2], grplabsize=4, linesize=1, barsize=1, pointsize=3, 
+           panelratio=c(4,1), divsize = 0.75, pointcol="white", showtitle=T, 
+           titlelab="ADMIXTURE analysis on O. tauri, SNPs thinned to 1 per 500 bases", 
+           splab=c("K=2","K=3","K=4"), outputfilename="ADMIXTURE_Otauri",
+           imgtype="pdf",height=3,width=25)
+
+plot(p$plot[[1]])
+
+
+```
+
+
+Finding the mean and standard deviation of pi for each population:
+
+```{r}
+setwd("~/Desktop/Ecological Genomics Terminal Output files/Pi output by population")
+
+ITpi <- read.table("IT.sites.pi", header=T)
+NCpi <- read.table("NC.sites.pi", header=T)
+WApi <- read.table("WA.sites.pi", header=T)
+
+summary(ITpi$PI)
+summary(NCpi$PI)
+summary(WApi$PI)
+
+sd(ITpi$PI)
+sd(NCpi$PI)
+sd(WApi$PI)
+
+```
+

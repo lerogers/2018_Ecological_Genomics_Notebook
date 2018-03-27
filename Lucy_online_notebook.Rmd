@@ -1123,14 +1123,6 @@ OTAU017483-RA	768	.	A	G	246	.	DP=226;VDB=0.962691;SGB=22.1453;RPB=0.577251;MQB=1
 [lerogers@pbio381 snps]$ pwd
 /data/project_data/beetles/snps
 [lerogers@pbio381 snps]$ cd ~
-[lerogers@pbio381 ~]$ mkdir myresults
-[lerogers@pbio381 ~]$ ll
-total 8
-drwxr-xr-x. 2 lerogers users 4096 Jan 31 10:55 cleanreads
-drwxr-xr-x. 2 lerogers users 4096 Jan 31 11:10 fastqcoutput
-drwxr-xr-x. 3 lerogers users   78 Feb 26 10:45 mydata
-drwxr-xr-x. 2 lerogers users    6 Feb 28 11:19 myresults
-drwxr-xr-x. 2 lerogers users   82 Feb  7 10:30 myscripts
 [lerogers@pbio381 ~]$ cd myresults
 [lerogers@pbio381 myresults]$ vcftools
 
@@ -1817,7 +1809,7 @@ grep "CV" log*out >chooseK.txt
 
 
 
-Here is the terminal thing: 
+Here is the terminal part: 
 
 
 
@@ -2004,18 +1996,139 @@ total 233984
 
 
 
-
-
-
 ------
 <div id='id-section15'/>
-### Page 15:
+### Page 15: 3-19-2018
+
+take .spd file, vcf2geno.sh bash script, and beetle.pop file (associates each sample name with the population it belongs to), and copy all 3 to myscripts:
+
+[lerogers@pbio381 myscripts]$ cp /data/project_data/beetles/metadata/beetle.pop .
+[lerogers@pbio381 myscripts]$ cp /data/scripts/beetle.spid /data/scripts/vcf2geno.sh .
+
+All 3 of these files need to be in the same directory, because that is the only place where this script can look, you can't put a pathway to another place. So now that we put everything in the same directory, we should be set to run the script.
+
+We used vi to open the .spd file and checked the line labled #select population definition file. THIS IS WHAT WE CAN CHANGE IN THE FUTURE
+
+Then we opened the bash script and looked at the java -Xmx2G which means to assign a max of 2G to the job. We can increase this value if we get an error telling us there isn't enough momory. The next flag, -jar, says it will give you a path to the directory, it won't change. The input file path WILL change...this is currently the path to the file where we thinned the SNPs down to only 1 per 1000 bp.  The output file has the same code as the input file but it has a different extention on it, the .geno extension. For output format, we could specify anything, but EIGENSOFT is what makes the .geno file. then we direct it to SPID, which is in myscripts.
+
+Then, we read the script!  
+
+[lerogers@pbio381 myscripts]$ bash vcf2geno.sh 
+
+We checked myresults, and the file was successfully there, with today's date and time.
+
+Then we peeked: 
+[lerogers@pbio381 myresults]$ head out.recode.vcf.geno 
+
+0 = AA
+1 = AT
+2 = TT
+9 = missing
+
+Next, we opened up our ADMIX script from our myresults folder and checked our loop that lets us run the loop for each value of K from 1 to 10. We took out the space between j and 4 and added an = between cv and 10, to make it work successfully.
+
+For the test, low values of CV means it's good, there's a low degree of mismatch between the test and where it actually gets assigned. So the CV should be lowest for the best value of K.
+
+The grep line will search for lines in the log files that contain the characters "CV" and then put them out into a new file called chooseK.txt.  The default value after grep is the whole line that contains the characters.
+
+Now, we are checking the permissions of this script.
+
+[lerogers@pbio381 myresults]$ ll ADMIX.sh 
+-rwxr--r--. 1 lerogers users 151 Mar 19 10:43 ADMIX.sh
+
+We have rwx permissions, so we're good.
+
+Now, after running the script, in our myresuls file we have a .P file which contains allele frequencies, a .Q file which contains ancestry coefficients, and a .log logged output file, for each K value. We also have the single chooseK file. We can print that to screen: 
+
+[lerogers@pbio381 myresults]$ cat chooseK.txt 
+log10.out:CV error (K=10): 0.74078
+log1.out:CV error (K=1): 0.44089
+log2.out:CV error (K=2): 0.43635
+log3.out:CV error (K=3): 0.44475
+log4.out:CV error (K=4): 0.47987
+log5.out:CV error (K=5): 0.51791
+log6.out:CV error (K=6): 0.55534
+log7.out:CV error (K=7): 0.58280
+log8.out:CV error (K=8): 0.62599
+log9.out:CV error (K=9): 0.66978
+
+So, we are saying that none of these models are correct but now we know which ones might be useful to look at. So we will choose to look at K=2, 3, 4. So we need to download those Q files to an admixture file on our local machine, as well as bringing in the metadata (cols.txt)
+
+
+******
+
+Now, we are moving back to R in order create a new script called Population Structure OTAU.R
+
+
 ------
 <div id='id-section16'/>
-### Page 16:
+### Page 16: 03-21-2018
+
+Discussion on board about calculating Fst
+
+Prior odds of 10 is the default on BayeScan but it's a terrible idea, we should increase the prior to be more stringent. We typed in bayescan to terminal to get the default parameters that we can look at.
+
+Now, we are writing a bash script to run the BayeScan Program. My prior odds are 5000. Then we did :w ~/myscripts/bayescan5000.sh to save it as a file with the name bayescan5000.sh in my myscripts folder. Then we gave ourselves permission to run it...from the myscripts folder we did 
+[lerogers@pbio381 myscripts]$ chmod u+x bayescan5000.sh
+
+We entered a screen and ran this script and will let it run over the weekend. ctrl A+D lets us exit the screen.  If we wanted to reattach, we would to screen -r.
+
+
 ------
 <div id='id-section17'/>
-### Page 17:
+### Page 17: 3-26-2018
+
+We started off the coding part of class by talking about Bayesian Inference. 
+
+Bayescan can be viewed as a 3D landscape where the height represents how likely the parameters are where x and y coordinates represent the parameters.
+
+The Markov Chain can zero in on the heights on the landscape so you do more of the simulations there.
+
+The simulator shows that you need to do multiple chains in order to have a higher probability of correctly understading a more complex landscape, such as one that has multiple peaks. 
+
+Burn-in time: Time between when we start from a random spot and when we reach a stable sampling area.
+
+In our data, the LL (log likelihood) is dependent on the allele frequencies for the high locus from each population, the amt of genetic drift that each pop has experienced, and the amount of natural selection that each locus underwent in addition to drift.
+
+The first thing to do with MCMC is to look at the output, and that's really important. 
+
+What do the output files contain? _AccRte.txt contains acceptance rate of output chain...how quickly it moves through likelihood space; fst.txt contains alpha values and posterior probability; .sel contains likelihood values throughout the chain; Verif.txt contains log data that tells you the parameters, etc
+
+My run has not finished because my prior odds were high, at 5000...so, I am going to do this next part with one of Suraj's runs.  His data is named 10_fst.txt and 10.sel. We also need information on chromosome location of each SNP, since it isn't included in this part.  It is in the vcf file on our myresults folder. We ran the commans with vcftools and the file is out.kept.sites, and that has what we need.
+
+
+Now we have 3 new files in our ecological genomics output files, and we are starting a new R script.
+
+On Wednesday, we'll pick up on looking up which particular SNPS are under selection and what they do.
+
+
+HEre is the command line from today: 
+
+
+
+[lerogers@pbio381 myresults]$ ll *vcf
+-rw-r--r--. 1 lerogers users  42047182 Mar  5 11:23 OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users 177630740 Feb 28 11:34 OTAU_2018_samtoolsFILTERED.vcf.recode.vcf
+-rw-r--r--. 1 lerogers users   3730115 Mar  7 11:02 out.recode.vcf
+[lerogers@pbio381 myresults]$ vcftools --vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf --kept-sites 
+ 
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95_biallelic_MAF01_Miss0.8.vcf.recode.vcf
+	--kept-sites
+
+After filtering, kept 72 out of 72 Individuals
+Outputting Kept Sites...
+After filtering, kept 133291 out of a possible 133291 Sites
+Run Time = 2.00 seconds
+[lerogers@pbio381 myresults]$ ll
+total 254128
+
+
+
+
 ------
 <div id='id-section18'/>
 ### Page 18:
