@@ -1,3 +1,5 @@
+
+
 ## Author: Lucy Rogers     
 ## Ecological Genomics: Spring 2018
 
@@ -36,56 +38,18 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 * [Page 8:2018-02-14](#id-section8). Writing R Script, actual script is posted here
 * [Page 9:2018-02-21](#id-section9). Writing R Script
 * [Page 10: 2018-02-26](#id-section10).Intro to SNP and Genotype Calling
-* [Page 11:](#id-section11).
-* [Page 12:](#id-section12).
-* [Page 13:](#id-section13).
-* [Page 14:](#id-section14).
-* [Page 15:](#id-section15).
-* [Page 16:](#id-section16).
-* [Page 17:](#id-section17).
-* [Page 18:](#id-section18).
-* [Page 19:](#id-section19).
-* [Page 20:](#id-section20).
-* [Page 21:](#id-section21).
-* [Page 22:](#id-section22).
-* [Page 23:](#id-section23).
-* [Page 24:](#id-section24).
-* [Page 25:](#id-section25).
-* [Page 26:](#id-section26).
-* [Page 27:](#id-section27).
-* [Page 28:](#id-section28).
-* [Page 29:](#id-section29).
-* [Page 30:](#id-section30).
-* [Page 31:](#id-section31).
-* [Page 32:](#id-section32).
-* [Page 33:](#id-section33).
-* [Page 34:](#id-section34).
-* [Page 35:](#id-section35).
-* [Page 36:](#id-section36).
-* [Page 37:](#id-section37).
-* [Page 38:](#id-section38).
-* [Page 39:](#id-section39).
-* [Page 40:](#id-section40).
-* [Page 41:](#id-section41).
-* [Page 42:](#id-section42).
-* [Page 43:](#id-section43).
-* [Page 44:](#id-section44).
-* [Page 45:](#id-section45).
-* [Page 46:](#id-section46).
-* [Page 47:](#id-section47).
-* [Page 48:](#id-section48).
-* [Page 49:](#id-section49).
-* [Page 50:](#id-section50).
-* [Page 51:](#id-section51).
-* [Page 52:](#id-section52).
-* [Page 53:](#id-section53).
-* [Page 54:](#id-section54).
-* [Page 55:](#id-section55).
-* [Page 56:](#id-section56).
-* [Page 57:](#id-section57).
-* [Page 58:](#id-section58).
-* [Page 59:](#id-section59).
-* [Page 60:](#id-section60).
+* [Page 11: 2018-02-28] (#id-section11).Diversity and Site Frequency Spectrum (SFS)
+* [Page 12:](#id-section12).  Oops, I accidentally left this one blank.
+* [Page 13: 2018-03-05](#id-section13).finishing tutorial on vcftools, making SFS in R
+* [Page 14:2018-03-07](#id-section14). Plotting .frq outputs in R and setting up ADMIXTURE
+* [Page 15: 2018-03-19](#id-section15).Running ADMIXTURE
+* [Page 16: 2018-03-21](#id-section16). Setting up BayeScan
+* [Page 17: 2018-03-26](#id-section17). Interpreting BayeScan output
+* [Page 18: 2018-03-28](#id-section18). Visualizing Bayescan Output
+* [Page 19:2018-04 and 2018-05](#id-section19). A large document of notes from the final project with Suraj
+* [Page 20: 2018-04-25](#id-section20). Script for taking the mean of the pi estimates
+* [Page 21: 2018-05-03](#id-section21). Script for SweeD Visualization
+
 
 ------
 <div id='id-section1'/>
@@ -755,7 +719,7 @@ labeledHeatmap(Matrix = moduleTraitCor, xLabels = names(btraitData), yLabels = n
 
 ------
 <div id='id-section10'/>
-### Page 10: 2-26-2018: Intro to SNP and Genotype Calling
+### Page 10: 2018-02-26: Intro to SNP and Genotype Calling
 
 Right now our sam file is human readable, we are going to write a bash script so we can let it run without us babysitting it and put it into bam. My sam file is called WA_PP1_F3_bwamem.sam and is in my sam folder, inside my mydata folder.
 
@@ -972,7 +936,7 @@ total 11682908
 
 ------
 <div id='id-section11'/>
-### Page 11: 2018-2-28: Diversity and Site Frequency Spectrum (SFS)
+### Page 11: 2018-02-28: Diversity and Site Frequency Spectrum (SFS)
 
 In vim text editor, use :wq to write your script and then quit; essentially to save the edits.
 
@@ -1249,7 +1213,7 @@ Run Time = 38.00 seconds
 ### Page 12:
 ------
 <div id='id-section13'/>
-### Page 13: 3-5-2018
+### Page 13: 2018-03-05 finishing tutorial on vcftools, making SFS in R
 
 From terminal, enter r using R command. Leave R using quit()
 
@@ -1592,7 +1556,7 @@ OTAU000033-RA	753	2	46	1	0
 
 ------
 <div id='id-section14'/>
-### Page 14: 3-7-2018
+### Page 14: 2018-03-07 Plotting .frq outputs in R and running ADMIXTURE
 
 To do (on board at beginning of class)
 
@@ -1998,7 +1962,7 @@ total 233984
 
 ------
 <div id='id-section15'/>
-### Page 15: 3-19-2018
+### Page 15: 2018-03-19 Running ADMIXTURE
 
 take .spd file, vcf2geno.sh bash script, and beetle.pop file (associates each sample name with the population it belongs to), and copy all 3 to myscripts:
 
@@ -2062,7 +2026,7 @@ Now, we are moving back to R in order create a new script called Population Stru
 
 ------
 <div id='id-section16'/>
-### Page 16: 03-21-2018
+### Page 16: 2018-03-21 Setting up BayeScan
 
 Discussion on board about calculating Fst
 
@@ -2076,7 +2040,7 @@ We entered a screen and ran this script and will let it run over the weekend. ct
 
 ------
 <div id='id-section17'/>
-### Page 17: 3-26-2018
+### Page 17: 2018-03-26 Interpreting BayeScan output
 
 We started off the coding part of class by talking about Bayesian Inference. 
 
@@ -2131,132 +2095,445 @@ total 254128
 
 ------
 <div id='id-section18'/>
-### Page 18:
+### Page 18: 2018-03-28 Visualizing Bayescan Output
+
+Today, my Bayescan with prior odds 5000 and thinning interval 10 had run so I put in in my EG ouput files directory and ran the 3-26-2018 R script and zoomed in on the x axis to make sure that there was no scale at which a pattern was detectable. Steve used prior odds 1000 and found that his had a pattern.
+
+Then, we continued writing the code to read in FST_sites and write in our False Discovery Rate.
+
+We compared significant snps for everyone's different prior odds, see these in my paper notebook.
+
+What prior odds do we want to do? We must decide
+
+
+
+Below is the script we used in R: 
+
+# This script analyses my Bayescan output
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files")
+
+#Read in teh SNP ID information
+
+sites <- read.table("out.kept.sites", header=T)
+
+#Bring in likelihood data
+LL <- read.table("bayescan_prodds5000_thin10.sel", header=T)
+
+#plot Log Likelihood as a function of step value to make sure we've gotten rid of the burn-in by checking that there's no overall trend. We want to see a "fuzzy caterpillar"
+ plot(LL$logL, type="o", col="gray", ylab="Log-Likelihood", xlim=c(0,500))
+ 
+ #What if they were sampling differently sized peaks?
+ par(mfrow=c(3,1))
+ plot(LL$Fst1, type="o", col="gray", ylab="Fst1")
+ plot(LL$Fst2, type="o", col="blue", ylab="Fst2")
+ plot(LL$Fst3, type="o", col="red", ylab="Fst3")
+
+ Fst <- read.table("10_fst.txt", header=T) 
+ #in interpreting this table, prob is the probability it's under selction (Prob H given D), log10 is the log10 of that number; qval shows selection significance, can be interpreted like a p value but controls for false discovery rate; alpha shows what type of selection it's under; 
+ 
+ Fst_sites <- cbind(sites,Fst)
+ 
+ Fst_sites$log10q = -log10(Fst_sites$qval)
+
+ FDR = 0.01
+ 
+ candsnps_prior5000 <- Fst_sites[which(Fst_sites$log10q>(-log10(FDR))),]
+ dim(candsnps_prior5000)
+
+ table(droplevels(candsnps_prior5000$CHROM)) 
+ 
+ plot(Fst_sites$fst, Fst_sites$alpha, xlab="Fst",ylab="alpha")
+points(candsnps_prior5000$fst, candsnps_prior5000$alpha, col="red",pch=16) 
+
+write.table(candsnps_prior5000$CHROM, "bayescan_pr5000_candsnps.txt",quote=F,row.names=F,col.names=F)
+
+
 ------
 <div id='id-section19'/>
-### Page 19:
+### Page 19: A large document of notes from my work with Suraj
+
+April 16, 2018
+
+Ran vcftoools on the vcf file OTAU_2018_reads2snps_DP10GP95.vcf in the Lucy Suraj folder to create 3 different *.frq.count files, one for each population:
+
+vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --min-alleles 1 --max-alleles 2 --max-missing 0.8 --keep NC.pop --counts --out NC
+
+Then we created a directory called “bayenv” in Lucy Suraj and moved the *.frq.count files as well as the countFormat.sh script into that directory.
+
+Next we opened countFormat.sh file and modified the file locations. 
+```
+#!/bin/bash
+
+cd /data/project_data/beetles/share/Lucy Suraj/bayenv
+
+mkdir cut
+mkdir cut/ALT
+mkdir cut/REF
+
+sed -i -e "1d" *.count
+
+for f in *.count
+do
+  cut -f5 $f > cut/REF/$f.REF.cut
+  cut -f6 $f > cut/ALT/$f.ALT.cut
+done
+
+
+paste cut/REF/*.cut >cut/REF/REF_ALL.cut
+paste cut/ALT/*.cut > cut/ALT/ALT_ALL.cut
+
+cd /data/project_data/beetles/share/Lucy Suraj/bayenv
+ls *.count > popnames
+sed -i -- 's/.count//g' popnames
+tr "\n" "\t" < popnames > popnames2
+
+cat popnames2 cut/REF/REF_ALL.cut > cut/REF/REF_ALL2.cut
+cat popnames2 cut/ALT/ALT_ALL.cut > cut/ALT/ALT_ALL2.cut
+
+~
+~
+"countFormat.sh" 28L, 575C 
+
+```
+
+
+
+The next thing we need to do is redo the filtering including min allele 2 and maf 0.01 so that we can only look at biallelic sites for bayenv.
+
+vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --min-alleles 2 --max-alleles 2 --max-missing 0.8 --maf 0.01 --keep NC.pop --counts --out NC
+
+
+
+4-18-2018
+
+We moved the *.frq.count files to our bayenv directory and opened them to make sure all the data had both major and minor alleles
+
+Suraj is redoing the VCF files so that the filters are applied first, and then it’s separated into the three populations
+
+Lucy is trying to make the vector of locus ID’s and vector of serial numbers. I am using the file out.recode.vcf which is the vcf file of all the data, with just the following filters applied.
+
+Parameters as interpreted:
+	--vcf OTAU_2018_reads2snps_DP10GP95.vcf
+	--maf 0.01
+	--max-alleles 2
+	--min-alleles 2
+	--max-missing 0.8
+
+
+This created a file called out.kept.sites that is a vector of locus ID’s. The chromosomes and positions were in different columns, so we replaced the tab with _
+
+:%s/\t/_/g
+
+We then used R to create odd and even vectors, each containing 133291 entries because our filtered vcf file contained 133291 sites, and we wrote these vectors as tables. Here are the commands: 
+
+> num_ref <- seq(1, 133291*2, 2) ## This will give odd numbers from 1 through 133291*2
+> num_alt <- seq(2, 133291*2, 2) ## Thsi will give even numbers starting with 2
+> head(num_ref)
+[1]  1  3  5  7  9 11
+> head(num_alt)
+[1]  2  4  6  8 10 12
+> write.table(num_ref, 'num_ref.txt', row.names=F, col.names=T, sep='\t', quote=F)
+> write.table(num_alt, 'num_alt.txt', row.names=F, col.names=T, sep='\t', quote=F)
+> 
+
+
+The tables are saved in Lucy Suraj as num_ref.txt and num_alt.txt
+
+Then we pasted together the sites location, number vectors, and allele count data: 
+
+paste out.kept.sites num_ref.txt REF/REF_ALL2.cut > REF_ALL3.cut 
+
+We did the similar command for pasting alt sites too, and stitched them together using 
+
+cat REF_ALL3.cut ALT_ALL3.cut > REFALT.counts
+
+And finally reordered the sites using R in command line:
+
+counts <- read.table('REFALT.counts', header=T)) counts2 <- counts[order(counts$x),] 
+write.table(counts2, 'REFALT_FINAL.counts', quote=F, sep='\t', row.names=F, col.names=T vim REFALT_FINAL.counts
+
+We had to relabel column “x” as numeric in order to do so.
+
+We ran the following code to generate input matrix for Bayenv2 analysis. This matrix is a variance covariance matrix of three populations. 0 represents that matrix to be created -p represents number of population; -k is the number of iterations, -r is the random seed number 
+
+```
+bayenv2 0 -i Bayenv_input.txt -p 3 -k 100000 -r 88734 > Lucy Suraj_matrix.out
+```
+
+./calc_bayenv.sh <Name of your SNPSFILE> <Name of your ENVFILE> <Name of your MATFILE> <Number of populations> <Number of MCMC iterations> <Number of environmental factors>
+
+./calc_bayenv.sh Bayenv_input.txt  environfile.txt  omega.out 3 100000 1 
+
+
+4-23-2018
+
+In order to get snpeff to work, we took the file vcftoscaffold_positions.txt and cut out the 2nd and 3rd columns (chrom and pos) using the following command: 
+
+ cut -d' ' -f2,3 vcf2scaffold_positions.txt > chrompos.txt
+
+4-24-2018
+
+We used the --min-allele 1 --max-allele 2 --max-missing 0.8 --position chrompos.txt command to create a vcf file (snps_transcript_id.recode.vcf) that contains only the mono and di-allelic sites that correspond to positions in the chrompos.txt file.
+
+Next, we removed the header from that file and also removed the chromosomes and position columns, to create a new file called cut.vcf:
+
+grep -v "#" snps_transcript_id.recode.vcf  | cut -f3- > cut.vcf
+
+Then, we created a text file containing just scaffold and position, pasted that into the cut.vcf file, re-added the header, and renamed our final file to scaffolds.vcf. We then split this vcf file into the 3 populations.
+
+cut -d" " -f4,5 vcf2scaffold_positions.txt > scaffoldpos.txt
+paste scaffoldpos.txt cut.vcf > paste.vcf
+grep "#" snps_transcript_id.recode.vcf > header.txt
+cat paste.vcf >> header.txt
+mv header.txt scaffolds.vcf
+
+Here is an example of how we split the vcf file:
+
+vcftools --vcf scaffolds.vcf --keep NC.pop --recode --out NCscaffolds
+
+Then, from the directory snpEff, we ran snpEff:
+
+java -Xmx4g -jar ./snpEff.jar OTAU /data/project_data/beetles/share/LucySuraj/scaffolds.vcf > snpeffscaffolds.vcf
+
+
+4-25-2018
+
+We added a tab between chrom and pos and tried running snpEff again
+sed -e 's/\(S[a-z]*[0-9]*\) /\1\t/g' scaffolds.vcf >scaffoldstab.vcf
+
+java -Xmx4g -jar ./snpEff.jar OTAU /data/project_data/beetles/share/LucySuraj/scaffoldstab.vcf > snpeffscaffolds.vcf
+
+
+We turned the annotated vcf vile snpeffscaffolds.vcf into an annotated file with chromosome/position, called snpeffcontigs.vcf:
+
+grep -v "#" snpeffscaffolds.vcf  | cut -f3- > cut2.vcf
+paste chrompos.txt cut2.vcf > paste2.vcf
+grep "#" snpeffscaffolds.vcf > header1.txt
+cat paste2.vcf >> header1.txt
+mv header1.txt snpeffcontigs.vcf
+
+We uploaded snpeffcontigs.vcf and snpeffscaffolds.vcf to /share/snpeff for everyone to use
+
+FOR PI CALCULATIONS
+
+Globally, using mono- and bi-allelic:
+vcftools --vcf snps_transcript_id.recode.vcf --site-pi --out globalpi
+
+Globally, using mono- and bi-allelic, by population:
+vcftools --vcf snps_transcript_id.recode.vcf --site-pi --keep NC.pop --out NCpi
+
+These were read into R as a table: 
+
+# This script takes the mean from my pi calculations
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files/Pi")
+
+global <- read.table("globalpi.sites.pi", header=T)
+ITglobal <- read.table("ITpi.sites.pi", header = T)
+NCglobal <- read.table("NCpi.sites.pi", header = T)
+WAglobal <- read.table("WApi.sites.pi", header = T)
+
+mean(global$PI)
+sd(global$PI)
+
+mean(ITglobal$PI)
+sd(ITglobal$PI)
+
+mean(WAglobal$PI)
+sd(WAglobal$PI)
+
+mean(NCglobal$PI)
+sd(NCglobal$PI)
+
+
+
+
+For Tajima’s D calculation: We calculated Tajima’s D value for each population. The bin size for calculating Tajima’s D value was given a high number 1,000,000 (assuming that none of our contig size is greater than this number; thus it ensured that Tajima’s D was calculated on the window size of our contigs) 
+
+```
+vcftools --vcf OTAU_2018_reads2snps_DP10GP95.vcf --max-alleles 2 --min-alleles 2 --max-missing 0.8 --keep NC.pop --TajimaD 1000000 --out NC_TD1000000
+```
+
+4-29-2018
+
+To calculate pi syn and nonsyn for biallelic sites, we first separated the biallelic sites into two files, nonsyn.vcf and syn.vcf, using the following commands: 
+
+# Get the nonsyn SNPs and put into a file:
+grep "missense_variant" snpeffcontigs.biallelic.vcf.recode.vcf >nonsyn.snps
+grep "initiator_codon_variant" snpeffcontigs.biallelic.vcf.recode.vcf >nonsyn1.snps  
+
+# get the header:
+head -n14 snpeffcontigs.biallelic.vcf.recode.vcf >snpeffheader.out
+
+# put it together:
+cat nonsyn.snps >>snpeffheader.out
+cat nonsyn1.snps>>snpeffheader.out
+
+# rename the file:
+mv snpeffheader.out nonsyn.vcf
+
+
+######And for synonymous snps: 
+# Get the nonsyn SNPs and put into a file:
+grep "synonymous_variant" snpeffcontigs.biallelic.vcf.recode.vcf >syn.snps
+grep "start_retained" snpeffcontigs.biallelic.vcf.recode.vcf >syn1.snps  #wc=0
+
+# get the header:
+head -n14 snpeffcontigs.biallelic.vcf.recode.vcf >snpeffheader.out
+
+# put it together:
+cat syn.snps >>snpeffheader.out
+
+# rename the file:
+mv snpeffheader.out syn.vcf
+
+The commands for actually calculating pi: 
+
+vcftools --vcf nonsyn.vcf --site-pi --out globalnonsynpi
+vcftools --vcf syn.vcf --site-pi --out globalsynpi
+vcftools --vcf syn.vcf --site-pi --keep NC.pop --out NCsynpi
+vcftools --vcf nonsyn.vcf --site-pi --keep NC.pop --out NCnonsynpi
+
+
+
+Here was the command for SweeD:
+
+./sweed-master/SweeD -name NC -input NCMaxmissing1.recode.vcf -grid 2
+
+
+To visualize SweeD, we first had to pull out the chromosome numbers that ran effectively from the sweed file for each population, for example: 
+
+perl -0777 -pe 's/\/\/([0-9]+)\nPosition\tLikelihood\tAlpha\n.+\n.+\n/\1/g' SweeD_Report.NC | grep "^[0-9]" >NCsweedchrom
+
+Then, we had to pull out the chromosome names that were present in each vcf file, in order, which we did using the following bash script: 
+
+#!/bin/bash
+
+vcftools --vcf NCMaxmissing1.recode.vcf --kept-sites
+
+mv out.kept.sites NC.kept.sites
+
+cut -f1 NC.kept.sites | uniq > NCsweedsites.contigs
+
+
+
+vcftools --vcf ITMaxmissing1.recode.vcf --kept-sites
+
+mv out.kept.sites IT.kept.sites
+
+cut -f1 IT.kept.sites | uniq > ITsweedsites.contigs
+
+
+
+vcftools --vcf WAMaxmissing1.recode.vcf --kept-sites
+
+mv out.kept.sites WA.kept.sites
+
+cut -f1 WA.kept.sites | uniq > WAsweedsites.contigs
+
+
+Next, we worked in R.
+
+
+
+
+
+To get the SweeD data to work in R, we first removed the header from each entry:
+
+grep -v "Position" SweeD_Report.NC > SweeD_ReportNC_noHeader
+
+grep -v "//" SweeD_ReportNC_noHeader >SweeD_ReportNC_nochrom
+
+
+Three most selected genes in each population: 
+
+IT: OTAU007977-RA (chrom 527),  OTAU007119-RA (chrom 2611), OTAU013138-RA (chrom 2917)
+NC: OTAU011017-RA (chrom 803),  OTAU012284-RA (chrom 821***), OTAU002567-RA
+(chrom 2067)
+WA: OTAU014993-RA (chrom 2001), OTAU004745-RA (3038), OTAU007632-RA (3078*)
+
+
+
+5/3/2018
+
+Today, I redid the syn and nonsyn pi estimates to include other nonsyn possibilities. Here are the revised commands. 
+
+For nonsyn biallelic vcf: 
+
+grep -e "initiator_codon_variant" -e "missense_variant" -e "stop_lost" -e "5_prime_UTR_premature_start_codon_gain_variant" -e "start_lost" -e "stop_gained" snpeffcontigs.biallelic.vcf.recode.vcf >snpeff.nonsynonmouscontigs
+
+head -n14 snpeffcontigs.biallelic.vcf.recode.vcf >snpeffheader.out
+cat snpeff.nonsynonmouscontigs >>snpeffheader.out 
+mv snpeffheader.out nonsyn.snpeff.vcf
+
+
+For syn biallelic vcf: 
+
+grep -e "synonymous_variant" -e "start_retained" -e "stop_retained_variant" snpeffcontigs.biallelic.vcf.recode.vcf >snpeff.synonymouscontigs
+
+head -n14 snpeffcontigs.biallelic.vcf.recode.vcf >snpeffheader.out
+cat snpeff.synonmouscontigs >>snpeffheader.out 
+mv snpeffheader.out syn.snpeff.vcf
+
+
+For actually calculating pi: 
+vcftools --vcf nonsyn.snpeff.vcf --site-pi --out globalnonsynpi
+vcftools --vcf nonsyn.snpeff.vcf --site-pi --keep ../NC.pop --out NCnonsynpi
+vcftools --vcf syn.snpeff.vcf --site-pi --out globalsynpi
+vcftools --vcf syn.snpeff.vcf --site-pi --keep ../NC.pop --out NCsynpi
+
+
 ------
 <div id='id-section20'/>
-### Page 20:
+### Page 20: Script for taking the mean of the pi estimates
+
+
+# This script takes the mean from my pi calculations
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files/Pi")
+
+global <- read.table("globalpi.sites.pi", header=T)
+ITglobal <- read.table("ITpi.sites.pi", header = T)
+NCglobal <- read.table("NCpi.sites.pi", header = T)
+WAglobal <- read.table("WApi.sites.pi", header = T)
+
+mean(global$PI)
+sd(global$PI)
+
+mean(ITglobal$PI)
+sd(ITglobal$PI)
+
+mean(WAglobal$PI)
+sd(WAglobal$PI)
+
+mean(NCglobal$PI)
+sd(NCglobal$PI)
+
+
 ------
 <div id='id-section21'/>
-### Page 21:
-------
-<div id='id-section22'/>
-### Page 22:
-------
-<div id='id-section23'/>
-### Page 23:
-------
-<div id='id-section24'/>
-### Page 24:
-------
-<div id='id-section25'/>
-### Page 25:
-------
-<div id='id-section26'/>
-### Page 26:
-------
-<div id='id-section27'/>
-### Page 27:
-------
-<div id='id-section28'/>
-### Page 28:
-------
-<div id='id-section29'/>
-### Page 29:
-------
-<div id='id-section30'/>
-### Page 30:
-------
-<div id='id-section31'/>
-### Page 31:
-------
-<div id='id-section32'/>
-### Page 32:
-------
-<div id='id-section33'/>
-### Page 33:
-------
-<div id='id-section34'/>
-### Page 34:
-------
-<div id='id-section35'/>
-### Page 35:
-------
-<div id='id-section36'/>
-### Page 36:
-------
-<div id='id-section37'/>
-### Page 37:
-------
-<div id='id-section38'/>
-### Page 38:
-------
-<div id='id-section39'/>
-### Page 39:
-------
-<div id='id-section40'/>
-### Page 40:
-------
-<div id='id-section41'/>
-### Page 41:
-------
-<div id='id-section42'/>
-### Page 42:
-------
-<div id='id-section43'/>
-### Page 43:
-------
-<div id='id-section44'/>
-### Page 44:
-------
-<div id='id-section45'/>
-### Page 45:
-------
-<div id='id-section46'/>
-### Page 46:
-------
-<div id='id-section47'/>
-### Page 47:
-------
-<div id='id-section48'/>
-### Page 48:
-------
-<div id='id-section49'/>
-### Page 49:
-------
-<div id='id-section50'/>
-### Page 50:
-------
-<div id='id-section51'/>
-### Page 51:
-------
-<div id='id-section52'/>
-### Page 52:
-------
-<div id='id-section53'/>
-### Page 53:
-------
-<div id='id-section54'/>
-### Page 54:
-------
-<div id='id-section55'/>
-### Page 55:
-------
-<div id='id-section56'/>
-### Page 56:
-------
-<div id='id-section57'/>
-### Page 57:
-------
-<div id='id-section58'/>
-### Page 58:
-------
-<div id='id-section59'/>
-### Page 59:
-------
-<div id='id-section60'/>
-### Page 60:
+### Page 21: 2018-05-03 Script for SweeD Visualization
+
+# This script takes the mean from my pi calculations
+
+setwd("~/Desktop/Ecological Genomics Terminal Output files/Pi")
+
+global <- read.table("globalpi.sites.pi", header=T)
+ITglobal <- read.table("ITpi.sites.pi", header = T)
+NCglobal <- read.table("NCpi.sites.pi", header = T)
+WAglobal <- read.table("WApi.sites.pi", header = T)
+
+mean(global$PI)
+sd(global$PI)
+
+mean(ITglobal$PI)
+sd(ITglobal$PI)
+
+mean(WAglobal$PI)
+sd(WAglobal$PI)
+
+mean(NCglobal$PI)
+sd(NCglobal$PI)
 
 ------
