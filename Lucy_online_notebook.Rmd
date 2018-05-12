@@ -1,4 +1,8 @@
 
+# Lucy: Your notebook starts out a bit disorganized, with bulk copy/paste of your terminal outputs with little annotation. But, as the semester went on, you got progressively better about organizing your entiries and adding in useful annotations to describe what you did. By the end, culminating with your project entires, you really had embraced the utility ofthe notebook. Nice job! I hope it's useful for you in the future. --Steve
+
+
+
 
 ## Author: Lucy Rogers     
 ## Ecological Genomics: Spring 2018
